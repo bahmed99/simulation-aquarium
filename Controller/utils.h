@@ -60,4 +60,39 @@ typedef struct Aquarium Aquarium;
 Aquarium* loadAquarium(char *AquariumName);
 
 
+/**
+ * @brief Display an aquarium
+ * 
+ * @param aquarium
+ */
+void showAquarium(const Aquarium* aquarium);
+
+/**
+ * @brief Add a view to an aquarium
+ * 
+ * @param a 
+ * @param name 
+ * @param width 
+ * @param height 
+ * @param x 
+ * @param y 
+ */
+void addView(Aquarium* a, const char* name, int width, int height, int x, int y);
+
+
+/**
+ * @brief Delete a view from an aquarium
+ * 
+ * @param a 
+ * @param viewName 
+ */
+void deleteView(Aquarium* a, char* viewName);
+
+/**
+ * @brief Save an aquarium to a file
+ * 
+ * @param aquarium
+ */
+
+
 #endif

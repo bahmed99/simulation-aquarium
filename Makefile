@@ -1,5 +1,5 @@
 
-all: utils test server view
+all: utils test  view
 
 utils: 
 	gcc -c Controller/utils.c -o Build/utils.o

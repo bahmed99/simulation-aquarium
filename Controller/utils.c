@@ -3,7 +3,7 @@
 #include <string.h>
 #include "utils.h"
 
-Aquarium* loadAquarium(char *AquariumName)
+Aquarium *loadAquarium(char *AquariumName)
 {
 
     char *extension = ".txt";
@@ -30,7 +30,7 @@ Aquarium* loadAquarium(char *AquariumName)
     fscanf(fp, "%dx%d", &dimensions[0], &dimensions[1]);
 
     // Création d'une variable de type Aquarium et initialisation des dimensions
-    Aquarium* aquarium = (struct Aquarium *)malloc(sizeof(struct Aquarium));
+    Aquarium *aquarium = (struct Aquarium *)malloc(sizeof(struct Aquarium));
     aquarium->num_views = 0;
     strcpy(aquarium->name, AquariumName);
     aquarium->dimensions[0] = dimensions[0];
@@ -69,28 +69,24 @@ Aquarium* loadAquarium(char *AquariumName)
 
     // Fermer le fichier
     fclose(fp);
-    printf("aquarium loaded (%d display view) ! \n" , aquarium->num_views);
+    printf("aquarium loaded (%d display view) !" , aquarium->num_views);
     return aquarium;
 }
 
-
-
-void showAquarium(const Aquarium* aquarium)
+void showAquarium(const Aquarium *aquarium)
 {
     // Afficher les dimensions de l'aquarium
     printf("%dx%d\n", aquarium->dimensions[0], aquarium->dimensions[1]);
-    
+
     // Pour chaque vue de l'aquarium, afficher son nom et ses coordonnées
-  for (int i = 0; i < aquarium->num_views; i++) {
-    printf("%s ", aquarium->views[i].name);
-    printf("%dx%d+%d+%d\n", aquarium->views[i].width, aquarium->views[i].height, aquarium->views[i].coord.x, aquarium->views[i].coord.y);
+    for (int i = 0; i < aquarium->num_views; i++)
+    {
+        printf("%s ", aquarium->views[i].name);
+        printf("%dx%d+%d+%d\n", aquarium->views[i].width, aquarium->views[i].height, aquarium->views[i].coord.x, aquarium->views[i].coord.y);
+    }
 }
-}
 
-
-
-
-void addView(Aquarium* a, const char* name, int width, int height, int x, int y)
+void addView(Aquarium *a, const char *name, int width, int height, int x, int y)
 {
     // Vérifier que l'aquarium a suffisamment de place pour une nouvelle vue
     // if (a->num_views >= MAX_VIEWS)
@@ -114,9 +110,7 @@ void addView(Aquarium* a, const char* name, int width, int height, int x, int y)
     printf("View %s added.\n", name);
 }
 
-
-
-void deleteView(Aquarium* a, char* viewName)
+void deleteView(Aquarium *a, char *viewName)
 {
     int index = -1;
 
@@ -148,7 +142,26 @@ void deleteView(Aquarium* a, char* viewName)
     printf("View %s deleted.\n", viewName);
 }
 
+void saveAquarium(Aquarium *a, char* aquariumName)
+{
+    // Ouvrir le fichier en mode écriture
+    char *extension = ".txt";
+    char *filename = (char *)malloc(strlen(aquariumName) + strlen(extension) + 1);
+    strcpy(filename, aquariumName);
+    strcat(filename, extension);
+    FILE *fp = fopen(filename, "w");
 
+    // Écrire les dimensions de l'aquarium dans le fichier
+    fprintf(fp, "%dx%d \n", a->dimensions[0], a->dimensions[1]);
 
+    // Écrire les vues de l'aquarium dans le fichier
+    for (int i = 0; i < a->num_views; i++)
+    {
+        fprintf(fp, "%s %dx%d+%d+%d \n", a->views[i].name, a->views[i].width, a->views[i].height, a->views[i].coord.x, a->views[i].coord.y);
+    }
 
+    
 
+    printf("Aquarium saved (%d display view)!\n", a->num_views);
+
+}

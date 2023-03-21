@@ -92,7 +92,9 @@ void deleteView(Aquarium* a, char* viewName);
  * @brief Save an aquarium to a file
  * 
  * @param aquarium
+ * @param aquariumName
  */
+void saveAquarium(Aquarium* aquarium, char* aquariumName);
 
 
 #endif

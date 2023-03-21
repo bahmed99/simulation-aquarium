@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
+#include <fcntl.h>
+#include <unistd.h>
+
 
 Aquarium *loadAquarium(char *AquariumName)
 {
@@ -142,26 +145,78 @@ void deleteView(Aquarium *a, char *viewName)
     printf("View %s deleted.\n", viewName);
 }
 
-void saveAquarium(Aquarium *a, char* aquariumName)
-{
+void saveAquarium(Aquarium *a, char *aquariumName)
+{ 
+
     // Ouvrir le fichier en mode écriture
     char *extension = ".txt";
     char *filename = (char *)malloc(strlen(aquariumName) + strlen(extension) + 1);
     strcpy(filename, aquariumName);
     strcat(filename, extension);
-    FILE *fp = fopen(filename, "w");
 
+    int fd = open(filename, O_CREAT|O_RDWR, 0666);
+
+ 
     // Écrire les dimensions de l'aquarium dans le fichier
-    fprintf(fp, "%dx%d \n", a->dimensions[0], a->dimensions[1]);
+    dprintf(fd, "%dx%d\n", a->dimensions[0], a->dimensions[1]);
 
     // Écrire les vues de l'aquarium dans le fichier
     for (int i = 0; i < a->num_views; i++)
     {
-        fprintf(fp, "%s %dx%d+%d+%d \n", a->views[i].name, a->views[i].width, a->views[i].height, a->views[i].coord.x, a->views[i].coord.y);
+        dprintf(fd, "%s %dx%d+%d+%d\n", a->views[i].name, a->views[i].width, a->views[i].height, a->views[i].coord.x, a->views[i].coord.y);
     }
 
-    
-
     printf("Aquarium saved (%d display view)!\n", a->num_views);
+}
+
+int addFish(Aquarium *a,char* viewName,  char* name, int height,int weight,  char* mobilityPattern){
+
+    int test=0;
+    Fish newFish;
+    strcpy(newFish.name, name);
+    newFish.weight = weight;
+    newFish.height = height;
+    strcpy(newFish.mobilityPattern, mobilityPattern);
+    for (int i = 0; i < a->num_views; i++)
+    {
+        if (strcmp(a->views[i].name, viewName) == 0)
+        {
+            a->views[i].fishes[a->views[i].num_fishes] = newFish;
+            a->views[i].num_fishes++;
+            test=1;
+            break;
+        }
+    }
+
+    return test;
+
+}
+
+int deleteFish(Aquarium *a,char* viewName,  char* name){
+
+    int test=0;
+
+    for (int i = 0; i < a->num_views; i++)
+    {
+        if (strcmp(a->views[i].name, viewName) == 0)
+        {
+            for (int j = 0; j < a->views[i].num_fishes; j++)
+            {
+                if (strcmp(a->views[i].fishes[j].name, name) == 0)
+                {
+                    for (int k = j; k < a->views[i].num_fishes - 1; k++)
+                    {
+                        a->views[i].fishes[k] = a->views[i].fishes[k + 1];
+                    }
+                    a->views[i].num_fishes--;
+                    test=1;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    return test;
 
 }

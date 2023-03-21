@@ -1,11 +1,15 @@
 import java.io.*;
 import java.net.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class Client {
+    private static final String CONFIG_FILE_PATH = "./affichage.cfg";
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-
+   
     public Client(String host, int port) {
         try {
             clientSocket = new Socket(host, port);
@@ -42,9 +46,34 @@ public class Client {
         }
     }
 
+ 
+
+
     public static void main(String[] args) {
-        String host = args[0];
-        int port = Integer.parseInt(args[1]);
-        Client client = new Client(host, port);
-    }
+        //extraire les informations du fichier affichage.cfg
+        Properties props = new Properties();
+
+        try (FileInputStream fis = new FileInputStream(CONFIG_FILE_PATH)) {
+            props.load(fis);
+
+            String controller_port = props.getProperty("controller-port");
+            String server = props.getProperty("controller-address");
+            int port = Integer.parseInt(controller_port);
+            //instanciation d'un client
+             Client client = new Client(server, port);
+
+            System.out.println("Controller Port: " + controller_port);
+            System.out.println("Controller Address " + server);
+
+        } catch (IOException e) {
+            System.err.println("Error loading config file: " + e.getMessage());
+        }
+
+
+
+      
+       
+
+    
+}
 }

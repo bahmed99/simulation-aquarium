@@ -69,7 +69,7 @@ Aquarium *loadAquarium(char *AquariumName)
 
     // Fermer le fichier
     fclose(fp);
-    printf("aquarium loaded (%d display view) !" , aquarium->num_views);
+    printf("aquarium loaded (%d display view) ! \n" , aquarium->num_views);
     return aquarium;
 }
 

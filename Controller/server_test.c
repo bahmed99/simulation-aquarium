@@ -3,15 +3,20 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdint.h>
+
 
 #define MAX_CLIENTS 10
+
+
 
 enum poisson_t { clown = 0 };
 
@@ -55,9 +60,28 @@ int error(char *s){
     exit(1);
 }
 
+char buffer[256];
+
+void* routine(void* ClntSock) {
+    while(1){
+        int length = read((intptr_t) ClntSock, buffer, 255);
+        if (length < 0) {
+            printf("ERROR reading from socket\n");
+            exit(1);
+        }
+        printf("Here is the message: %s\n", buffer);
+        length = write((intptr_t) ClntSock, "I got your message", 18);
+        if (length < 0) {
+            printf("ERROR writing to socket\n");
+            exit(1);
+        }
+    }
+    return NULL;
+}
+
 int main(int argc, char *argv[]) {
+    
     if (argc != 2) return EXIT_FAILURE;
-    char buffer[256];
     char buffer2[256];
     int ServSock;
     int ClntSock;
@@ -98,7 +122,7 @@ int main(int argc, char *argv[]) {
         /* ClntSock is connected to a client */
     printf("Connected to %s:%d\n", inet_ntoa(ClntAddr.sin_addr), ClntAddr.sin_port);
         /* Handler  (Client)*/
-
+/*
     length = read(ClntSock, buffer, 255);
     if (length < 0) {
         printf("ERROR reading from socket\n");
@@ -111,16 +135,18 @@ int main(int argc, char *argv[]) {
         printf("ERROR writing to socket\n");
 
         exit(1);
-    }
+    }*/
     
        /* __________________________________  */
+    pthread_t thread;
+    pthread_create(&thread, NULL, &routine, (void *) (intptr_t) ClntSock);
     while (1) {
-        printf("> ");
+        write(1, "> \n", sizeof("> \n"));
         bzero(buffer2, 256);
-        fgets(buffer2, 255, 0);
+        read(0, buffer2, 255);
         if (strncmp(buffer2, "load aquarium", strlen("load aquarium")) == 0) {
             load_aquarium(); // Needs to be coded later
-            n = write(1, "Aquarium loaded !", strlen("Aquarium loaded !"));
+            n = write(1, "Aquarium loaded !\n", strlen("Aquarium loaded !\n"));
         }
         else if (strncmp(buffer2, "show aquarium", strlen("show aquarium")) == 0) {
             show_aquarium();
@@ -128,23 +154,23 @@ int main(int argc, char *argv[]) {
 
         else if (strncmp(buffer2, "save aquarium", strlen("save aquarium")) == 0) {
             save_aquarium();
-            n = write(1, "Aquarium saved !", strlen("Aquarium saved !"));
+            n = write(1, "Aquarium saved !\n", strlen("Aquarium saved !\n"));
         }
 
         else if (strncmp(buffer2, "save aquarium", strlen("save aquarium")) == 0) {
             save_aquarium();
-            n = write(1, "Aquarium saved !", strlen("Aquarium saved !"));
+            n = write(1, "Aquarium saved !\n", strlen("Aquarium saved !\n"));
         }
 
         else if (strncmp(buffer2, "save aquarium", strlen("save aquarium")) == 0) {
             save_aquarium();
-            n = write(1, "Aquarium saved !", strlen("Aquarium saved !"));
+            n = write(1, "Aquarium saved !\n", strlen("Aquarium saved !\n"));
         }
 
         if (n < 0)
             error("ERROR writing to socket");
     }
     /* __________________________________  */
-
+    pthread_join(thread, NULL);
     return EXIT_SUCCESS;
 }

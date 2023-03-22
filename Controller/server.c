@@ -1,53 +1,163 @@
-/* A simple server in the internet domain using TCP
-   The port number is passed as an argument */
+#include <stdio.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/socket.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/select.h>
 
-void error(char *msg)
-{
-    perror(msg);
-    exit(1);
+#define MAX_CLIENTS 4
+
+char buffer2[256];
+
+void* ClientHandler(void *ClntSock) {
+    char buffer[256];
+    while(1) {
+        int length = read((intptr_t) ClntSock, buffer, 255);
+        if (length < 0) {
+            printf("ERROR reading from socket\n");
+            exit(1);
+        }
+        if (strncmp(buffer, "status\n", strlen("status\n")) == 0) {
+            length = write((intptr_t) ClntSock, "OK\n", 3);
+            // status();   
+        }
+        else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
+            length = write((intptr_t) ClntSock, "OK\n", 3);
+            // addFish();
+        }
+        else if (strncmp(buffer, "delFish\n", strlen("delFish\n")) == 0) {
+            length = write((intptr_t) ClntSock, "OK\n", 3);
+            // delFish();
+        }
+        else if (strncmp(buffer, "startFish\n", strlen("startFish\n")) == 0) {
+            length = write((intptr_t) ClntSock, "OK\n", 3);
+            // startFish();
+        }
+        else {
+            length = write((intptr_t) ClntSock, "Command not found\n", strlen("Command not found\n"));
+        }
+        if (length < 0) {
+            printf("ERROR writing to socket\n");
+            exit(1);
+        }
+    }
+    return NULL;      
 }
 
-int main(int argc, char *argv[])
-{
-    int sockfd, newsockfd, portno, clilen;
-    char buffer[256];
-    struct sockaddr_in serv_addr, cli_addr;
+void ServerHandler(char *buffer) {
     int n;
-    if (argc < 2)
-    {
-        fprintf(stderr, "ERROR, no port provided\n");
+    if (strncmp(buffer, "load aquarium", strlen("load aquarium")) == 0) {
+        //load_aquarium(); 
+            n = write(1, "Aquarium loaded !\n", strlen("Aquarium loaded !\n"));
+    }
+    else if (strncmp(buffer, "show aquarium", strlen("show aquarium")) == 0) {
+        //show_aquarium();
+    }
+
+    else if (strncmp(buffer, "save aquarium", strlen("save aquarium")) == 0) {
+        //save_aquarium();
+        n = write(1, "Aquarium saved !\n", strlen("Aquarium saved !\n"));
+    } 
+    else if (strncmp(buffer, "exit", strlen("exit")) == 0) {
+        n = write(1, "GoodBye\n", strlen("GoodBye\n"));
+        exit(1);
+    } else {}
+
+    if (n < 0)  {
         exit(1);
     }
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+}
 
-    if (sockfd < 0)
-        error("ERROR opening socket");
-    bzero((char *)&serv_addr, sizeof(serv_addr));
-    portno = atoi(argv[1]);
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(portno);
-    if (bind(sockfd, (struct sockaddr *)&serv_addr,
-             sizeof(serv_addr)) < 0)
-        error("ERROR on binding");
-    listen(sockfd, 5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd,
-                       (struct sockaddr *)&cli_addr,
-                       &clilen);
-    if (newsockfd < 0)
-        error("ERROR on accept");
-    bzero(buffer, 256);
-    n = read(newsockfd, buffer, 255);
-    if (n < 0)
-        error("ERROR reading from socket");
-    printf("Here is the message: %s\n", buffer);
-    n = write(newsockfd, "I got your message", 18);
-    if (n < 0)
-        error("ERROR writing to socket");
-    return 0;
+int main(int argc, char *argv[]) {
+    int NumPorts = argc - 1;
+    char buffer2[256];
+    int ServSock[NumPorts];
+    int ClntSock;
+    fd_set SocketSet;
+    struct timeval selTimeout;
+    unsigned int ServPort;
+    struct sockaddr_in ClntAddr;
+    int length;
+
+    int maxDescriptor = -1;
+    for (int port = 0; port < NumPorts; port++) {
+        int Srv;
+        struct sockaddr_in ServAddr;
+        int portno = atoi(argv[port + 1]);
+
+        if ((Srv = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+            printf("Socket Error for %i\n", portno);
+        }
+        ServAddr.sin_family = AF_INET;
+        ServAddr.sin_addr.s_addr = INADDR_ANY;
+        ServAddr.sin_port = htons(portno);
+
+        /* Binding socket*/
+        if (bind(Srv, (struct sockaddr*) &ServAddr, sizeof(ServAddr)) < 0) {
+            printf("Binding Error\n");
+            exit(1);
+        }
+        /* Start Listening*/
+        if (listen(Srv, 5) < 0) {
+            printf("Listen() Error\n");
+            exit(1);
+        }
+        ServSock[port] = Srv;
+        /*Saving the max sockets*/
+        if (ServSock[port] > maxDescriptor) {
+            maxDescriptor = ServSock[port];
+        }
+    }
+    pthread_t thread;
+    pid_t process_id;
+    if ((process_id = fork()) < 0) {
+        printf("fork() error\n");
+        exit(1);
+    }
+    if (process_id == 0) { // Child Process(server)
+        while (1) {
+            write(1, "> ", sizeof("> "));
+            bzero(buffer2, 256);
+            read(0, buffer2, 255);
+            ServerHandler(buffer2);
+        }
+    }
+    if (process_id != 0) { // Parent process(client handler)
+        while(1) {
+            FD_ZERO(&SocketSet);
+            FD_SET(STDIN_FILENO, &SocketSet);
+            for (int port = 0; port < NumPorts; port++) {
+                FD_SET(ServSock[port], &SocketSet);
+            }
+            if (select(maxDescriptor + 1, &SocketSet, NULL, NULL, &selTimeout) < 0) {
+                printf("select Error\n");
+                exit(1);
+            } else {
+                for (int port = 0; port < NumPorts; port++) {
+                    if (FD_ISSET(ServSock[port], &SocketSet)) {
+                        int ClntLen = sizeof(ClntAddr);
+                        /* Waiting for a client to connect */
+                        if ((ClntSock = accept(ServSock[port], (struct sockaddr *) &ClntAddr, &ClntLen))< 0) {
+                            printf("Accept() Error\n");
+                            exit(1);
+                        }
+                        pthread_t thread;
+                        pthread_create(&thread, NULL, &ClientHandler, (void *) (intptr_t) ClntSock);    
+                    }
+                }
+            }
+        }
+    }
+    /* Close sockets */
+    for (int port = 0; port < NumPorts; port++)
+        close(ServSock[port]) ;
+    close(ClntSock);
+    return EXIT_SUCCESS;
 }

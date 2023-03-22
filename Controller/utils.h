@@ -10,7 +10,9 @@ struct Fish
 {
     char name[50];
     int weight;
+    int height;
     char mobilityPattern[50];
+    int mobile;
 
 };
 typedef struct Fish Fish;
@@ -92,7 +94,30 @@ void deleteView(Aquarium* a, char* viewName);
  * @brief Save an aquarium to a file
  * 
  * @param aquarium
+ * @param aquariumName
  */
+void saveAquarium(Aquarium* aquarium, char* aquariumName);
 
+
+/**
+ * @brief Add a fish to a view
+ * 
+ * @param aquarium
+ * @param viewName
+ * @param name 
+ * @param weight 
+ * @param mobilityPattern 
+ */
+int addFish(Aquarium *a,char* viewName,  char* name, int height,int weight,  char* mobilityPattern);
+
+
+/**
+ * @brief Delete a fish from a view
+ * 
+ * @param aquarium
+ * @param viewName
+ * @param fishName
+ */
+int deleteFish(Aquarium *a, char* viewName, char* fishName);
 
 #endif

@@ -1,4 +1,8 @@
 #include "server.h"
+#include "utils.h"
+
+Aquarium* aquarium = NULL;
+
 
 void GetListString(char *String, char **output) {
     char * temp = strtok(String, " ");
@@ -57,18 +61,43 @@ void ServerHandler(char *buffer) {
     char *output[10];
     char *str_parse = malloc(100*sizeof(char));
 
-    if (strstr(buffer, "load")!= NULL) {
-        //load_aquarium(); 
-        GetListString(buffer, output);
-        if (output[1] != NULL) {
-            printf("%s loaded\n", output[1]);    
-        } else {
-            printf("[-] Enter a valid aquarium");
-        }
+    // if (strstr(buffer, "load")!= NULL) {
+    //     //load_aquarium(); 
+    //     GetListString(buffer, output);
+    //     if (output[1] != NULL) {
+    //         printf("%s loaded\n", output[1]);    
+    //     } else {
+    //         printf("[-] Enter a valid aquarium");
+    //     }
+    // }
+    char *pattern = "^load [a-zA-Z0-9]+$";
+    regex_t regex;
+    int reti = regcomp(&regex, pattern, REG_EXTENDED);
+    int len = strcspn(buffer, "\n");
+    buffer[len] = '\0'; // Ajoute un caractère nul à la fin de la sous-chaîne
+   
+    // Exécuter la recherche sur la chaîne de caractères
+    reti = regexec(&regex, buffer, 0, NULL, 0);
+
+    char *pattern1 = "^load ([a-zA-Z0-9]+)$";
+    char *word = NULL;
+
+    regmatch_t match[2];
+
+    regcomp(&regex, pattern1, REG_EXTENDED);
+    if (regexec(&regex, buffer, 2, match, 0) == 0) {
+        int len = match[1].rm_eo - match[1].rm_so;
+        word = malloc(len + 1);
+        strncpy(word, buffer + match[1].rm_so, len);
+        word[len] = '\0';
     }
 
+    if (!reti) {
+        aquarium=loadAquarium(word);
+    } 
+
     else if (strncmp(buffer, "show aquarium", strlen("show aquarium")) == 0) {
-        //show_aquarium();
+        showAquarium(aquarium);
     }
 
     else if (strstr(buffer, "save")!= NULL) {

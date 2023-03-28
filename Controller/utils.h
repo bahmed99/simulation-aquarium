@@ -1,6 +1,21 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <signal.h>
+#include <regex.h>
+
+
+
 /********* Déclaration des structures *********/
 
 
@@ -36,6 +51,7 @@ struct View
     int height;
     int num_fishes;
     Fish *fishes;
+    intptr_t socket;
    
 };
 typedef struct View View;
@@ -119,5 +135,18 @@ int addFish(Aquarium *a,char* viewName,  char* name, int height,int weight,  cha
  * @param fishName
  */
 int deleteFish(Aquarium *a, char* viewName, char* fishName);
+
+
+
+/**
+ * @brief authentication
+ * 
+ * @param input
+ * @param aquarium
+ * @param socket
+ * @return char*
+*/
+
+char* authenticate(char* input, Aquarium* aquarium, intptr_t socket) ;
 
 #endif

@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
 #include <fcntl.h>
 #include <unistd.h>
-
+#include "utils.h"
 
 Aquarium *loadAquarium(char *AquariumName)
 {
@@ -57,6 +56,8 @@ Aquarium *loadAquarium(char *AquariumName)
         View *new_view = (struct View *)malloc(sizeof(struct View));
         sscanf(line, "%s %dx%d+%d+%d", new_view->name, &new_view->width, &new_view->height, &new_view->coord.x, &new_view->coord.y);
 
+        new_view->socket = -1;
+
         // Ajout de la vue au tableau de vues
         if (aquarium->num_views == 0)
         {
@@ -72,7 +73,7 @@ Aquarium *loadAquarium(char *AquariumName)
 
     // Fermer le fichier
     fclose(fp);
-    printf("aquarium loaded (%d display view) ! \n" , aquarium->num_views);
+    printf("    -> aquarium loaded (%d display view) ! \n", aquarium->num_views);
     return aquarium;
 }
 
@@ -105,6 +106,7 @@ void addView(Aquarium *a, const char *name, int width, int height, int x, int y)
     newView.height = height;
     newView.coord.x = x;
     newView.coord.y = y;
+    newView.socket =-1;
 
     // Ajouter la nouvelle vue à l'aquarium
     a->views[a->num_views] = newView;
@@ -146,7 +148,7 @@ void deleteView(Aquarium *a, char *viewName)
 }
 
 void saveAquarium(Aquarium *a, char *aquariumName)
-{ 
+{
 
     // Ouvrir le fichier en mode écriture
     char *extension = ".txt";
@@ -154,9 +156,8 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     strcpy(filename, aquariumName);
     strcat(filename, extension);
 
-    int fd = open(filename, O_CREAT|O_RDWR, 0666);
+    int fd = open(filename, O_CREAT | O_RDWR, 0666);
 
- 
     // Écrire les dimensions de l'aquarium dans le fichier
     dprintf(fd, "%dx%d\n", a->dimensions[0], a->dimensions[1]);
 
@@ -169,9 +170,10 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-int addFish(Aquarium *a,char* viewName,  char* name, int height,int weight,  char* mobilityPattern){
+int addFish(Aquarium *a, char *viewName, char *name, int height, int weight, char *mobilityPattern)
+{
 
-    int test=0;
+    int test = 0;
     Fish newFish;
     strcpy(newFish.name, name);
     newFish.weight = weight;
@@ -183,18 +185,18 @@ int addFish(Aquarium *a,char* viewName,  char* name, int height,int weight,  cha
         {
             a->views[i].fishes[a->views[i].num_fishes] = newFish;
             a->views[i].num_fishes++;
-            test=1;
+            test = 1;
             break;
         }
     }
 
     return test;
-
 }
 
-int deleteFish(Aquarium *a,char* viewName,  char* name){
+int deleteFish(Aquarium *a, char *viewName, char *name)
+{
 
-    int test=0;
+    int test = 0;
 
     for (int i = 0; i < a->num_views; i++)
     {
@@ -209,7 +211,7 @@ int deleteFish(Aquarium *a,char* viewName,  char* name){
                         a->views[i].fishes[k] = a->views[i].fishes[k + 1];
                     }
                     a->views[i].num_fishes--;
-                    test=1;
+                    test = 1;
                     break;
                 }
             }
@@ -218,5 +220,41 @@ int deleteFish(Aquarium *a,char* viewName,  char* name){
     }
 
     return test;
+}
 
+char *authenticate(char *input, Aquarium *aquarium, intptr_t socket)
+{
+
+    char *id = (char *)malloc(10 * sizeof(char));
+    sscanf(input, "hello in as %10s", id);
+
+    int i;
+    if (strcmp("hello",input)!=0)
+    {   
+    
+        for (i = 0; i < aquarium->num_views; i++)
+        {
+            if (strcmp(aquarium->views[i].name, id)==0 && aquarium->views[i].socket == -1)
+            {
+                aquarium->views[i].socket = socket;
+
+                return id;
+            }
+           
+        }
+    }
+
+
+    int j;
+    for (j = 0; j < aquarium->num_views; j++)
+    {
+        if(aquarium->views[j].socket == -1) {
+
+            aquarium->views[j].socket = socket;
+
+            return aquarium->views[j].name;
+        }
+    }
+
+    return "no greeting";
 }

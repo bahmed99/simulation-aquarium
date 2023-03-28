@@ -150,21 +150,22 @@ void threads_management(int ClntSock, int maxDescriptor, int *ServSock, int NumP
         for (int port = 0; port < NumPorts; port++) {
             FD_SET(ServSock[port], &SocketSet);
         }
-        if (select(maxDescriptor + 1, &SocketSet, NULL, NULL, &selTimeout) < 0) {
+        if (NumPorts > 1) {
+            if (select(maxDescriptor + 1, &SocketSet, NULL, NULL, &selTimeout) < 0) {
             printf("[-] select Error\n");
             exit(1);
-        } else {
-            for (int port = 0; port < NumPorts; port++) {
-                if (FD_ISSET(ServSock[port], &SocketSet)) {
-                    int ClntLen = sizeof(ClntAddr);
+            }
+        }
+        for (int port = 0; port < NumPorts; port++) {
+            if (FD_ISSET(ServSock[port], &SocketSet)) {
+                int ClntLen = sizeof(ClntAddr);
                     /* Waiting for a client to connect */
-                    if ((ClntSock = accept(ServSock[port], (struct sockaddr *) &ClntAddr, &ClntLen))< 0) {
-                        printf("[-] Accept() Error\n");
-                        exit(1);
-                    }
-                    pthread_t thread;
-                    pthread_create(&thread, NULL, &ClientHandler, (void *) (intptr_t) ClntSock);    
-                    }
+                if ((ClntSock = accept(ServSock[port], (struct sockaddr *) &ClntAddr, &ClntLen))< 0) {
+                     printf("[-] Accept() Error\n");
+                    exit(1);
+                }
+                pthread_t thread;
+                pthread_create(&thread, NULL, &ClientHandler, (void *) (intptr_t) ClntSock);    
                 }
             }
         }

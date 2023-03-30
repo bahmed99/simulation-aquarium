@@ -3,6 +3,15 @@
 
 Aquarium* aquarium = NULL;
 
+char *commandPatterns[] = {
+    "^load [a-zA-Z0-9]+$",
+    "^hello( in as [a-zA-Z0-9]+)?$"
+};
+
+char *extractCommand[]={
+    "^load ([a-zA-Z0-9]+)$",
+    "^hello in as ([a-zA-Z0-9]+)$"
+};
 
 void GetListString(char *String, char **output) {
     char * temp = strtok(String, " ");
@@ -33,6 +42,21 @@ void* ClientHandler(void *ClntSock) {
             length = write((intptr_t) ClntSock, "OK\n", 3);
             // status();   
         }
+        else if(verifRegex(buffer, commandPatterns[1]) == 1){
+            char *id = extractString(buffer, extractCommand[1]);
+            char *msg = authenticate(id, aquarium, (intptr_t) ClntSock);
+            char auth[256];
+
+            if(msg == NULL) {
+                msg = "no greeting \n";
+            }
+            else{
+               sprintf(auth, "greeting %s \n", msg);
+            }
+            
+            length = write((intptr_t) ClntSock, auth, strlen(auth));
+
+        }
         else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
             length = write((intptr_t) ClntSock, "OK\n", 3);
             // addFish();
@@ -60,40 +84,10 @@ void ServerHandler(char *buffer) {
     int n;
     char *output[10];
     char *str_parse = malloc(100*sizeof(char));
+  
 
-    // if (strstr(buffer, "load")!= NULL) {
-    //     //load_aquarium(); 
-    //     GetListString(buffer, output);
-    //     if (output[1] != NULL) {
-    //         printf("%s loaded\n", output[1]);    
-    //     } else {
-    //         printf("[-] Enter a valid aquarium");
-    //     }
-    // }
-    char *pattern = "^load [a-zA-Z0-9]+$";
-    regex_t regex;
-    int reti = regcomp(&regex, pattern, REG_EXTENDED);
-    int len = strcspn(buffer, "\n");
-    buffer[len] = '\0'; // Ajoute un caractère nul à la fin de la sous-chaîne
-   
-    // Exécuter la recherche sur la chaîne de caractères
-    reti = regexec(&regex, buffer, 0, NULL, 0);
-
-    char *pattern1 = "^load ([a-zA-Z0-9]+)$";
-    char *word = NULL;
-
-    regmatch_t match[2];
-
-    regcomp(&regex, pattern1, REG_EXTENDED);
-    if (regexec(&regex, buffer, 2, match, 0) == 0) {
-        int len = match[1].rm_eo - match[1].rm_so;
-        word = malloc(len + 1);
-        strncpy(word, buffer + match[1].rm_so, len);
-        word[len] = '\0';
-    }
-
-    if (!reti) {
-        aquarium=loadAquarium(word);
+    if (verifRegex(buffer, commandPatterns[0]) == 1) {
+        aquarium=loadAquarium(extractString(buffer, extractCommand[0]));
     } 
 
     else if (strncmp(buffer, "show aquarium", strlen("show aquarium")) == 0) {
@@ -124,7 +118,9 @@ void ServerHandler(char *buffer) {
     else if (strncmp(buffer, "exit", strlen("exit")) == 0) {
         printf("GoodBye\nPress Ctrl+C to exit\n");
         exit(1);
-    } else {}
+    } else {
+        printf("Command not found\n");
+    }
 
     if (n < 0)  {
         exit(1);

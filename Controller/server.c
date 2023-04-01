@@ -32,11 +32,11 @@ void GetListString(char *String, char **output) {
         temp = strtok(NULL, " ");
     }
 }
-
 void* ClientHandler(void *client_fd) {
     char buffer[256];
     char *output[10];
     char *str_parse = malloc(100*sizeof(char));
+    
     while(1) {
         int length = read(*(int *)client_fd, buffer, 255);
         
@@ -50,7 +50,7 @@ void* ClientHandler(void *client_fd) {
         }
         else if(verifRegex(buffer, commandPatterns[1]) == 1){
             char *id = extractString(buffer, extractCommand[1]);
-            char *msg = authenticate(id, aquarium, (intptr_t) ClntSock);
+            char *msg = authenticate(id, aquarium, *(int*) client_fd);
             char auth[256];
 
             if(msg == NULL) {
@@ -60,7 +60,7 @@ void* ClientHandler(void *client_fd) {
                sprintf(auth, "greeting %s \n", msg);
             }
             
-            length = write((intptr_t) ClntSock, auth, strlen(auth));
+            length = write(*(int*) client_fd, auth, strlen(auth));
 
         }
         else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
@@ -78,6 +78,13 @@ void* ClientHandler(void *client_fd) {
         else {
             length = write(*(int*) client_fd, "Command not found\n", strlen("Command not found\n"));
         }
+        int num_bytes = read(*(int*)client_fd, buffer, sizeof(buffer));
+        if (num_bytes == 0) {
+            // Client has disconnected, close the socket and exit the thread
+            close(*(int*)client_fd);
+            pthread_exit(NULL);
+        }
+
     }
     return NULL;      
 }
@@ -171,10 +178,7 @@ int SocketsCreator(int *ServSock, char* port) {
     return maxDescriptor;
 }
 
-void SocketsCloser(int ClntSock, int ServSock) {
-    close(ServSock) ;
-    close(ClntSock);
-}
+
 
 void threads_management(int maxDescriptor, int ServSock, fd_set SocketSet) {
     struct sockaddr_in ClntAddr;
@@ -212,6 +216,10 @@ void threads_management(int maxDescriptor, int ServSock, fd_set SocketSet) {
                         } 
                         break;
                     }
+                    if (i == MAX_CLIENTS -1) {
+                        close(*new_ClntSock);
+                        continue;
+                    }
                 }
             }
         }
@@ -222,18 +230,37 @@ void handle_interrupt(int signal) {
     printf("\n[-]   Keyboard interrupt detected. Exiting...\n");
     exit(1);
 }
+int ExtractPort() {
+    FILE *config_file;
+    char buffer[1024];
+    int port;
+    config_file = fopen("Controller/controller.cfg", "r");
+    if (config_file == NULL) {
+        perror("Error opening config file");
+        exit(1);
+    }
+
+    while (fgets(buffer, sizeof(buffer), config_file) != NULL) {
+        if (strstr(buffer, "controller-port =") != NULL) {
+            port = atoi(strstr(buffer, "=") + 1);
+            break;
+        }
+    }
+    fclose(config_file);
+    return port;
+}
 
 int main(int argc, char *argv[]) {
+    char port[5];
+    sprintf(port, "%d", ExtractPort());
     int ServSock;
     fd_set SocketSet;
-    int maxDescriptor = SocketsCreator(&ServSock, argv[1]);
+    int maxDescriptor = SocketsCreator(&ServSock, port);
     for (int i = 0; i < MAX_CLIENTS; i++){
         clients_fds[i] = 0;
     }
     threads_management(maxDescriptor, ServSock, SocketSet);
-    
-    /* Close sockets */
-    //SocketsCloser(ClntSock, ServSock);
+    close(ServSock);
 
     return EXIT_SUCCESS;
 }

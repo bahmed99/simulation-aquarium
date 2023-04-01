@@ -42,14 +42,6 @@ void* ServerHandler(void *);
  */
 int SocketsCreator(int *ServSock, char* port);
 
-/**
- * @brief 
- * 
- * @param ClntSock
- * @param ServSock
- * @param NumPorts
- */
-void SocketsCloser(int ClntSock, int ServSock);
 
 
 /**

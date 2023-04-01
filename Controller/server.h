@@ -29,7 +29,7 @@ void* ClientHandler(void *ClntSock);
  * 
  * @param buffer  
  */
-void ServerHandler(char *buffer);
+void* ServerHandler(void *);
 
 
 /**
@@ -40,7 +40,7 @@ void ServerHandler(char *buffer);
  * @param ports
  * 
  */
-int SocketsCreator(int *ServSock, int NumPorts, char *ports[]);
+int SocketsCreator(int *ServSock, char* port);
 
 /**
  * @brief 
@@ -49,7 +49,7 @@ int SocketsCreator(int *ServSock, int NumPorts, char *ports[]);
  * @param ServSock
  * @param NumPorts
  */
-void SocketsCloser(int ClntSock, int *ServSock, int NumPorts);
+void SocketsCloser(int ClntSock, int ServSock);
 
 
 /**
@@ -60,7 +60,7 @@ void SocketsCloser(int ClntSock, int *ServSock, int NumPorts);
  * @param ServSock
  * @param NumPorts
  */
-void threads_management(int ClntSock, int maxDescriptor, int *ServSock, int NumPorts);
+void threads_management(int maxDescriptor, int ServSock, fd_set SocketSet);
 
 
 /**

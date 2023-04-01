@@ -1,4 +1,17 @@
 #include "server.h"
+#include "utils.h"
+
+Aquarium* aquarium = NULL;
+
+char *commandPatterns[] = {
+    "^load [a-zA-Z0-9]+$",
+    "^hello( in as [a-zA-Z0-9]+)?$"
+};
+
+char *extractCommand[]={
+    "^load ([a-zA-Z0-9]+)$",
+    "^hello in as ([a-zA-Z0-9]+)$"
+};
 
 #define MAX_CLIENTS 4
 
@@ -35,6 +48,21 @@ void* ClientHandler(void *client_fd) {
             length = write(*(int*) client_fd, "OK\n", 3);
             // status();   
         }
+        else if(verifRegex(buffer, commandPatterns[1]) == 1){
+            char *id = extractString(buffer, extractCommand[1]);
+            char *msg = authenticate(id, aquarium, (intptr_t) ClntSock);
+            char auth[256];
+
+            if(msg == NULL) {
+                msg = "no greeting \n";
+            }
+            else{
+               sprintf(auth, "greeting %s \n", msg);
+            }
+            
+            length = write((intptr_t) ClntSock, auth, strlen(auth));
+
+        }
         else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
             length = write(*(int*) client_fd, "OK\n", 3);
             // addFish();
@@ -58,19 +86,14 @@ void ServerAction(void *buffer) {
     int n;
     char *output[10];
     char *str_parse = malloc(100*sizeof(char));
+  
 
-    if (strstr(buffer, "load")!= NULL) {
-        //load_aquarium(); 
-        GetListString(buffer, output);
-        if (output[1] != NULL) {
-            printf("%s loaded\n", output[1]);    
-        } else {
-            printf("[-] Enter a valid aquarium");
-        }
-    }
+    if (verifRegex(buffer, commandPatterns[0]) == 1) {
+        aquarium=loadAquarium(extractString(buffer, extractCommand[0]));
+    } 
 
     else if (strncmp(buffer, "show aquarium", strlen("show aquarium")) == 0) {
-        //show_aquarium();
+        showAquarium(aquarium);
     }
 
     else if (strstr(buffer, "save")!= NULL) {
@@ -97,7 +120,9 @@ void ServerAction(void *buffer) {
     else if (strncmp(buffer, "exit", strlen("exit")) == 0) {
         printf("GoodBye\nPress Ctrl+C to exit\n");
         exit(1);
-    } else {}
+    } else {
+        printf("Command not found\n");
+    }
 
     if (n < 0)  {
         exit(1);

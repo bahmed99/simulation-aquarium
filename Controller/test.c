@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "utils.h"
 
-
+#include <regex.h>
 
 
 int main() {
@@ -13,13 +13,36 @@ int main() {
         exit(EXIT_FAILURE);
     }
     showAquarium(a);
-    printf("*********** \n");
-    addView(a,"N5",400,400,400,200);
-    printf("************ \n");
+
+
+    char *ch = authenticate("N1", a, 1);
+    printf("%s \n", ch);
+
+    char *ch1 = authenticate("N2", a, 2);
+    printf("%s \n", ch1);
+
+    char *ch2 = authenticate("N3", a, 3);
+    printf("%s \n", ch2);
+
+    char *ch3 = authenticate(NULL, a, 4);
+    printf("%s \n", ch3);
+
+    addView(a, "N5", 10, 10, 10, 10);
     showAquarium(a);
-    printf("*********** \n");
-    deleteView(a,"N3");
-    printf("*********** \n");
-    showAquarium(a);
+
+    char *ch4 = authenticate("N5", a, 5);
+    printf("%s \n", ch4);
+
+    char nom[] = "John";
+    char message[50];
+    
+    sprintf(message, "Bonjour %s", nom);
+    
+    printf("%s\n", message);  // Affiche "Bonjour John"
+    
+    return 0;
+
+   
+
     return 0;
 }

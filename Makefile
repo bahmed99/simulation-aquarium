@@ -1,5 +1,5 @@
 CC=gcc
-
+PATH_TO_FX=/home/bully/Desktop/javafx-sdk-20/lib
 all: utils test  view
 
 utils: 
@@ -15,6 +15,8 @@ server: utils
 view: 
 	javac -d Build View/Client.java 
 	java -cp Build Client
-	
+interface:
+	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java
+	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium
 clean:
 	rm -rf Build/*

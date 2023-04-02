@@ -34,18 +34,17 @@ void GetListString(char *String, char **output) {
 }
 void* ClientHandler(void *client_fd) {
     char buffer[256];
-    char *output[10];
-    char *str_parse = malloc(100*sizeof(char));
+    int length_write;
     
     while(1) {
         int length = read(*(int *)client_fd, buffer, 255);
-        
+       
         if (length < 0) {
             printf("ERROR reading from socket\n");
             exit(1);
         }
         if (strncmp(buffer, "status\n", strlen("status\n")) == 0) {
-            length = write(*(int*) client_fd, "OK\n", 3);
+            length_write = write(*(int*) client_fd, "OK\n", 3);
             // status();   
         }
         else if(verifRegex(buffer, commandPatterns[1]) == 1){
@@ -60,31 +59,32 @@ void* ClientHandler(void *client_fd) {
                sprintf(auth, "greeting %s \n", msg);
             }
             
-            length = write(*(int*) client_fd, auth, strlen(auth));
+            length_write = write(*(int*) client_fd, auth, strlen(auth));
 
         }
         else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
-            length = write(*(int*) client_fd, "OK\n", 3);
+            length_write = write(*(int*) client_fd, "OK\n", 3);
             // addFish();
         }
         else if (strncmp(buffer, "delFish\n", strlen("delFish\n")) == 0) {
-            length = write(*(int*) client_fd, "OK\n", 3);
+            length_write = write(*(int*) client_fd, "OK\n", 3);
             // delFish();
         }
         else if (strncmp(buffer, "startFish\n", strlen("startFish\n")) == 0) {
-            length = write(*(int*) client_fd, "OK\n", 3);
+            length_write = write(*(int*) client_fd, "OK\n", 3);
             // startFish();
         }
         else {
-            length = write(*(int*) client_fd, "Command not found\n", strlen("Command not found\n"));
+            length_write = write(*(int*) client_fd, "Command not found\n", strlen("Command not found\n"));
         }
-        int num_bytes = read(*(int*)client_fd, buffer, sizeof(buffer));
-        if (num_bytes == 0) {
+       
+        if (length == 0) {
+
             // Client has disconnected, close the socket and exit the thread
+            disconnect(aquarium, *(int*)client_fd);
             close(*(int*)client_fd);
             pthread_exit(NULL);
         }
-
     }
     return NULL;      
 }
@@ -234,7 +234,7 @@ int ExtractPort() {
     FILE *config_file;
     char buffer[1024];
     int port;
-    config_file = fopen("Controller/controller.cfg", "r");
+    config_file = fopen("controller.cfg", "r");
     if (config_file == NULL) {
         perror("Error opening config file");
         exit(1);

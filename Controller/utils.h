@@ -57,7 +57,7 @@ struct Aquarium
 {
     char name[50];
     int dimensions[2];
-    struct View *views;
+    View *views;
     int num_views;
 };
 typedef struct Aquarium Aquarium;
@@ -137,6 +137,18 @@ int deleteFish(Aquarium *a, char *viewName, char *fishName);
  */
 
 char *authenticate(char *input, Aquarium *aquarium, intptr_t socket);
+
+
+/**
+ * @brief remove fish from view and client socket when client disconnect
+ *
+ * @param aquarium
+ * @param client_socket
+ * 
+ */
+
+void disconnect(Aquarium *aquarium, intptr_t client_socket);
+
 
 /**
  * @brief verif command with regex

@@ -1,22 +1,28 @@
 CC=gcc
 PATH_TO_FX=/home/bully/Desktop/javafx-sdk-20/lib
-all: utils test  view
+BUILD_DIR=Build
+CFALGS=-Wall 
+
+all: utils test view
 
 utils: 
-	$(CC) -c Controller/utils.c -o Build/utils.o
+	$(CC) $(CFLAGS) -c Controller/utils.c -o $(BUILD_DIR)/utils.o
 
 test: utils
-	$(CC) -c Controller/test.c -o Build/test.o
-	$(CC) Build/test.o Build/utils.o -o Build/test
+	$(CC) $(CFLAGS) -c Controller/test.c -o $(BUILD_DIR)/test.o
+	$(CC) $(CFLAGS) $(BUILD_DIR)/test.o $(BUILD_DIR)/utils.o -o $(BUILD_DIR)/test
+
 server: utils
-	$(CC) -c Controller/server.c -o Build/server.o
-	$(CC) Build/server.o Build/utils.o -o Build/server
+	$(CC) $(CFLAGS) -c Controller/server.c -o $(BUILD_DIR)/server.o
+	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o -o $(BUILD_DIR)/server
 
 view: 
-	javac -d Build View/Client.java 
-	java -cp Build Client
+	javac -d $(BUILD_DIR) View/Client.java 
+	java -cp $(BUILD_DIR) Client
+
 interface:
 	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java
 	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium
+
 clean:
 	rm -rf Build/*

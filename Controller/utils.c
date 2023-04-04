@@ -180,7 +180,7 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-int addFish(Aquarium *a, char *viewName, char *name, Coordinates coord, int height, int weight, char *mobilityPattern)
+int addFish(Aquarium *a, int client, char *name, Coordinates coord, int height, int weight, char *mobilityPattern)
 {
     if (a != NULL)
 
@@ -194,8 +194,9 @@ int addFish(Aquarium *a, char *viewName, char *name, Coordinates coord, int heig
         strcpy(newFish.mobilityPattern, mobilityPattern);
         for (int i = 0; i < a->num_views; i++)
         {
-            if (strcmp(a->views[i].name, viewName) == 0)
+            if (a->views[i].socket == client)
             {
+                a->views[i].fishes = (Fish *)realloc(a->views[i].fishes, (a->views[i].num_fishes + 1) * sizeof(Fish));
                 a->views[i].fishes[a->views[i].num_fishes] = newFish;
                 a->views[i].num_fishes++;
                 test = 1;

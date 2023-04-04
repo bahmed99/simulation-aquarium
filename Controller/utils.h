@@ -21,15 +21,6 @@
 
 // Définition de la structure Fish
 
-struct Fish
-{
-    char name[50];
-    int weight;
-    int height;
-    char mobilityPattern[50];
-    int mobile;
-};
-typedef struct Fish Fish;
 
 // Définition de la structure Coordinates
 struct Coordinates
@@ -38,6 +29,18 @@ struct Coordinates
     int y;
 };
 typedef struct Coordinates Coordinates;
+
+struct Fish
+{
+    char name[50];
+    int width;
+    int height;
+    char mobilityPattern[50];
+    Coordinates coord;
+    int mobile;
+};
+typedef struct Fish Fish;
+
 
 // Définition de la structure View
 struct View
@@ -48,7 +51,7 @@ struct View
     int height;
     int num_fishes;
     Fish *fishes;
-    intptr_t socket;
+    int socket;
 };
 typedef struct View View;
 
@@ -113,10 +116,12 @@ void saveAquarium(Aquarium *aquarium, char *aquariumName);
  * @param aquarium
  * @param viewName
  * @param name
+ * @param coord
  * @param weight
+ * @param height
  * @param mobilityPattern
  */
-int addFish(Aquarium *a, char *viewName, char *name, int height, int weight, char *mobilityPattern);
+int addFish(Aquarium *a, char *viewName, char *name,Coordinates coord, int height, int weight, char *mobilityPattern);
 
 /**
  * @brief Delete a fish from a view
@@ -136,7 +141,7 @@ int deleteFish(Aquarium *a, char *viewName, char *fishName);
  * @return char*
  */
 
-char *authenticate(char *input, Aquarium *aquarium, intptr_t socket);
+char *authenticate(char *input, Aquarium *aquarium, int socket);
 
 
 /**
@@ -147,7 +152,7 @@ char *authenticate(char *input, Aquarium *aquarium, intptr_t socket);
  * 
  */
 
-void disconnect(Aquarium *aquarium, intptr_t client_socket);
+void disconnect(Aquarium *aquarium, int client_socket);
 
 
 /**
@@ -172,5 +177,18 @@ int verifRegex(char *buffer, char *pattern);
 **/
 
 char *extractString(char *buffer, char *pattern);
+
+
+
+/**
+ * @brief return status of view for client 
+ * 
+ * @param aquarium
+ * @param client
+ * 
+ * @return char*
+*/
+
+char *status(Aquarium *aquarium, int client);
 
 #endif

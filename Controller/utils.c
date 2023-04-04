@@ -57,6 +57,7 @@ Aquarium *loadAquarium(char *AquariumName)
         sscanf(line, "%s %dx%d+%d+%d", new_view->name, &new_view->width, &new_view->height, &new_view->coord.x, &new_view->coord.y);
 
         new_view->socket = -1;
+        new_view->num_fishes = 0;
 
         // Ajout de la vue au tableau de vues
         if (aquarium->num_views == 0)
@@ -79,6 +80,9 @@ Aquarium *loadAquarium(char *AquariumName)
 
 void showAquarium(const Aquarium *aquarium)
 {
+
+    if (aquarium == NULL)
+        return;
     // Afficher les dimensions de l'aquarium
     printf("%dx%d\n", aquarium->dimensions[0], aquarium->dimensions[1]);
 
@@ -92,6 +96,8 @@ void showAquarium(const Aquarium *aquarium)
 
 void addView(Aquarium *a, const char *name, int width, int height, int x, int y)
 {
+    if (a == NULL)
+        return;
 
     a->views = (View *)realloc(a->views, (a->num_views + 1) * sizeof(View));
     View newView;
@@ -101,6 +107,7 @@ void addView(Aquarium *a, const char *name, int width, int height, int x, int y)
     newView.coord.x = x;
     newView.coord.y = y;
     newView.socket = -1;
+    newView.num_fishes = 0;
 
     // Ajouter la nouvelle vue à l'aquarium
     a->views[a->num_views] = newView;
@@ -111,6 +118,10 @@ void addView(Aquarium *a, const char *name, int width, int height, int x, int y)
 
 void deleteView(Aquarium *a, char *viewName)
 {
+
+    if (a == NULL)
+        return;
+
     int index = -1;
 
     // Rechercher l'index de la vue à supprimer
@@ -143,6 +154,8 @@ void deleteView(Aquarium *a, char *viewName)
 
 void saveAquarium(Aquarium *a, char *aquariumName)
 {
+    if (a == NULL)
+        return;
 
     // Ouvrir le fichier en mode écriture
     char *extension = ".txt";
@@ -167,110 +180,123 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-int addFish(Aquarium *a, char *viewName, char *name, int height, int weight, char *mobilityPattern)
+int addFish(Aquarium *a, char *viewName, char *name, Coordinates coord, int height, int weight, char *mobilityPattern)
 {
+    if (a != NULL)
 
-    int test = 0;
-    Fish newFish;
-    strcpy(newFish.name, name);
-    newFish.weight = weight;
-    newFish.height = height;
-    strcpy(newFish.mobilityPattern, mobilityPattern);
-    for (int i = 0; i < a->num_views; i++)
     {
-        if (strcmp(a->views[i].name, viewName) == 0)
+        int test = 0;
+        Fish newFish;
+        newFish.coord = coord;
+        strcpy(newFish.name, name);
+        newFish.width = weight;
+        newFish.height = height;
+        strcpy(newFish.mobilityPattern, mobilityPattern);
+        for (int i = 0; i < a->num_views; i++)
         {
-            a->views[i].fishes[a->views[i].num_fishes] = newFish;
-            a->views[i].num_fishes++;
-            test = 1;
-            break;
+            if (strcmp(a->views[i].name, viewName) == 0)
+            {
+                a->views[i].fishes[a->views[i].num_fishes] = newFish;
+                a->views[i].num_fishes++;
+                test = 1;
+                break;
+            }
         }
-    }
 
-    return test;
+        return test;
+    }
 }
 
 int deleteFish(Aquarium *a, char *viewName, char *name)
 {
+    if (a != NULL)
 
-    int test = 0;
-
-    for (int i = 0; i < a->num_views; i++)
     {
-        if (strcmp(a->views[i].name, viewName) == 0)
+        int test = 0;
+
+        for (int i = 0; i < a->num_views; i++)
         {
-            for (int j = 0; j < a->views[i].num_fishes; j++)
+            if (strcmp(a->views[i].name, viewName) == 0)
             {
-                if (strcmp(a->views[i].fishes[j].name, name) == 0)
+                for (int j = 0; j < a->views[i].num_fishes; j++)
                 {
-                    for (int k = j; k < a->views[i].num_fishes - 1; k++)
+                    if (strcmp(a->views[i].fishes[j].name, name) == 0)
                     {
-                        a->views[i].fishes[k] = a->views[i].fishes[k + 1];
+                        for (int k = j; k < a->views[i].num_fishes - 1; k++)
+                        {
+                            a->views[i].fishes[k] = a->views[i].fishes[k + 1];
+                        }
+                        a->views[i].num_fishes--;
+                        test = 1;
+                        break;
                     }
-                    a->views[i].num_fishes--;
-                    test = 1;
-                    break;
+                }
+                break;
+            }
+        }
+
+        return test;
+    }
+}
+
+char *authenticate(char *id, Aquarium *aquarium, int socket)
+{
+    if (aquarium != NULL)
+
+    {
+        int i;
+
+        if (id != NULL)
+        {
+
+            for (i = 0; i < aquarium->num_views; i++)
+            {
+                if (strcmp(aquarium->views[i].name, id) == 0 && aquarium->views[i].socket == -1)
+                {
+                    aquarium->views[i].socket = socket;
+
+                    return id;
                 }
             }
-            break;
         }
-    }
 
-    return test;
-}
-
-char *authenticate(char *id, Aquarium *aquarium, intptr_t socket)
-{
-
-    int i;
-
-    if (id != NULL)
-    {
-
-        for (i = 0; i < aquarium->num_views; i++)
+        int j;
+        for (j = 0; j < aquarium->num_views; j++)
         {
-            if (strcmp(aquarium->views[i].name, id) == 0 && aquarium->views[i].socket == -1)
+            if (aquarium->views[j].socket == -1)
             {
-                aquarium->views[i].socket = socket;
 
-                return id;
+                aquarium->views[j].socket = socket;
+
+                return aquarium->views[j].name;
             }
         }
+
+        return NULL;
     }
-
-    int j;
-    for (j = 0; j < aquarium->num_views; j++)
-    {
-        if (aquarium->views[j].socket == -1)
-        {
-
-            aquarium->views[j].socket = socket;
-
-            return aquarium->views[j].name;
-        }
-    }
-
-    return NULL;
 }
 
-void disconnect(Aquarium *aquarium, intptr_t client_socket)
+void disconnect(Aquarium *aquarium, int client_socket)
 {
-    int i;
-    for (i = 0; i < aquarium->num_views; i++)
+    if (aquarium != NULL)
     {
-        if (aquarium->views[i].socket == client_socket)
+        int i;
+        for (i = 0; i < aquarium->num_views; i++)
         {
-            aquarium->views[i].socket = -1;
-            break;
+            if (aquarium->views[i].socket == client_socket)
+            {
+                aquarium->views[i].socket = -1;
+                break;
+            }
+        }
+
+        // remove fish
+        if (aquarium->views[i].num_fishes != 0)
+        {
+            aquarium->views[i].num_fishes = 0;
+            free(aquarium->views[i].fishes);
         }
     }
-
-    // remove fish
-    if(aquarium->views[i].num_fishes != 0){
-        aquarium->views[i].num_fishes = 0;
-        free(aquarium->views[i].fishes);
-    }
-   
 }
 
 int verifRegex(char *buffer, char *pattern)
@@ -349,5 +375,46 @@ char *extractString(char *buffer, char *pattern)
         regerror(reti, &regex, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Erreur lors de l'exécution de la recherche: %s\n", msgbuf);
         return NULL;
+    }
+}
+
+char *status(Aquarium *aquarium, int client)
+{
+    if (aquarium != NULL)
+    {
+        char *status = (char *)malloc(1000);
+        char *fishes = (char *)malloc(1000);
+        char *tmp = (char *)malloc(1000);
+        int i, j;
+
+        for (i = 0; i < aquarium->num_views; i++)
+        {
+            if (aquarium->views[i].socket == client)
+
+            {
+                if (aquarium->views[i].num_fishes == 0)
+                {
+                    sprintf(status, "OK : Connecté au contrôleur, 0 poisson trouvé\n");
+                    free(fishes);
+                    free(tmp);
+                    return status;
+                }
+
+                sprintf(status, "OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
+
+                for (j = 0; j < aquarium->views[i].num_fishes; j++)
+                {
+                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile ? "started" : "notStarted");
+                    strcat(fishes, tmp);
+                }
+                break;
+            }
+        }
+
+        strcat(status, fishes);
+
+        free(fishes);
+        free(tmp);
+        return status;
     }
 }

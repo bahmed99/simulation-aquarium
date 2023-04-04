@@ -21,12 +21,12 @@ public void run() throws IOException {
     BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
     String userInput;
 
-    System.out.print("> ");
+    System.out.print("$ ");
     while ((userInput = stdIn.readLine()) != null) {
         out.println(userInput);
         String response = in.readLine();
-        System.out.println("< " + response);
-        System.out.print("> ");
+        System.out.println("    -> " + response);
+        System.out.print("$ ");
     }
 }
 

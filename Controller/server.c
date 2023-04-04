@@ -44,8 +44,9 @@ void* ClientHandler(void *client_fd) {
             exit(1);
         }
         if (strncmp(buffer, "status\n", strlen("status\n")) == 0) {
-            length_write = write(*(int*) client_fd, "OK\n", 3);
-            // status();   
+            char *msg = status(aquarium, *(int*) client_fd);
+            length_write = write(*(int*) client_fd, msg, strlen(msg));
+            free(msg);
         }
         else if(verifRegex(buffer, commandPatterns[1]) == 1){
             char *id = extractString(buffer, extractCommand[1]);
@@ -75,7 +76,7 @@ void* ClientHandler(void *client_fd) {
             // startFish();
         }
         else {
-            length_write = write(*(int*) client_fd, "Command not found\n", strlen("Command not found\n"));
+            length_write = write(*(int*) client_fd, "NOK : commande introuvable\n", strlen("NOK : commande introuvable\n"));
         }
        
         if (length == 0) {

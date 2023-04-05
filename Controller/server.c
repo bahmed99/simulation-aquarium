@@ -2,16 +2,30 @@
 #include "utils.h"
 
 Aquarium* aquarium = NULL;
-
-char *commandPatterns[] = {
+//regular expressions to handle server commands
+char *serverCommand[] = {
     "^load [a-zA-Z0-9]+$",
-    "^hello( in as [a-zA-Z0-9]+)?$"
-};
+    "^add view N[0-9]+ [0-9]+x[0-9]+\\+[0-9]+\\+[0-9]+$",
+    "^del view N[0-9]+$",
+    "^save [a-zA-Z0-9]+$",
 
-char *extractCommand[]={
-    "^load ([a-zA-Z0-9]+)$",
-    "^hello in as ([a-zA-Z0-9]+)$"
 };
+char *extractServerCommand[]={
+    "^load ([a-zA-Z0-9]+)$",
+    "^add view (N[0-9]+) ([0-9]+)x([0-9]+)\\+([0-9]+)\\+([0-9]+)$",
+    "^del view (N[0-9]+)$",
+    "^save ([a-zA-Z0-9]+)$",
+
+};
+//regular expressions to handle client commands
+char *  []={
+    "^hello( in as [a-zA-Z0-9]+)?$",
+}
+
+char *extractClientCommand[]={
+    "^hello in as ([a-zA-Z0-9]+)$",
+}
+
 
 #define MAX_CLIENTS 4
 
@@ -48,8 +62,8 @@ void* ClientHandler(void *client_fd) {
             length_write = write(*(int*) client_fd, msg, strlen(msg));
             free(msg);
         }
-        else if(verifRegex(buffer, commandPatterns[1]) == 1){
-            char *id = extractString(buffer, extractCommand[1]);
+        else if(verifRegex(buffer, clientCommand[0]) == 1){
+            char *id = extractStrings(buffer, extractclientCommand[0],1)[0];
             char *msg = authenticate(id, aquarium, *(int*) client_fd);
             char auth[256];
 
@@ -63,6 +77,7 @@ void* ClientHandler(void *client_fd) {
             length_write = write(*(int*) client_fd, auth, strlen(auth));
 
         }
+        //add Fish
         else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0) {
             length_write = write(*(int*) client_fd, "OK\n", 3);
             // addFish();
@@ -94,41 +109,45 @@ void ServerAction(void *buffer) {
     int n;
     char *output[10];
     char *str_parse = malloc(100*sizeof(char));
-  
-
-    if (verifRegex(buffer, commandPatterns[0]) == 1) {
-        aquarium=loadAquarium(extractString(buffer, extractCommand[0]));
+    //debug
+    printf("le contenu du buffer est : %s", (char *)buffer);
+    //load aquarium
+    if (verifRegex(buffer, serverCommand[0]) == 1) {
+        char ** params = extractStrings(buffer,extractServerCommand[0],1);
+        aquarium=loadAquarium(params[0]);
     } 
-
+    
+    //show aquarium
     else if (strncmp(buffer, "show aquarium", strlen("show aquarium")) == 0) {
         showAquarium(aquarium);
     }
 
-    else if (strstr(buffer, "save")!= NULL) {
-        //load_aquarium(); 
-        GetListString(buffer, output);
-        if (output[1] != NULL) {
-            printf("%s saved\n", output[1]);    
-        } else {
-            printf("[-] Enter a valid aquarium");
+    //add view
+    else if (verifRegex(buffer, serverCommand[2]) == 1) {
+    char **params = extractStrings(buffer, extractServerCommand[2], 5);
+        int x = atoi(params[1]);
+        int y = atoi(params[2]);
+        int width = atoi(params[3]);
+        int height = atoi(params[4]);
+        addView(aquarium, params[0], x, y, width, height);
+        for (int i = 0; i < 5; i++) {
+            free(params[i]);
         }
-    }
-
-    else if (strstr(buffer, "add view")!= NULL) {
-        //add_view();
-        n = write(1, "view added\n", strlen("view added\n"));
-    }
-
-    else if (strstr(buffer, "del view")!= NULL) {
-        //del_view();
-        GetListString(buffer, output);
-        printf("view %s deleted\n", output[2]);
-    }
-
-    else if (strncmp(buffer, "exit", strlen("exit")) == 0) {
-        printf("GoodBye\nPress Ctrl+C to exit\n");
-        exit(1);
-    } else {
+        free(params);
+   
+    } 
+    //delete view
+   else if (verifRegex(buffer, serverCommand[3]) == 1) {
+    char **params = extractStrings(buffer, extractServerCommand[3], 1);
+    deleteView(aquarium, params[0]);
+}
+    //save aquarium
+    else if (verifRegex(buffer, serverCommand[4]) == 1) {
+        char ** params = extractStrings(buffer,extractServerCommand[4],1);
+        saveAquarium(aquarium,params[0]);
+    } 
+    
+    else {
         printf("Command not found\n");
     }
 

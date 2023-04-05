@@ -87,12 +87,13 @@ void showAquarium(const Aquarium *aquarium);
  *
  * @param a
  * @param name
- * @param width
- * @param height
  * @param x
  * @param y
+ * @param width
+ * @param height
+
  */
-void addView(Aquarium *a, const char *name, int width, int height, int x, int y);
+void addView(Aquarium *a, const char *name, int x, int y ,int width, int height);
 
 /**
  * @brief Delete a view from an aquarium
@@ -171,12 +172,13 @@ int verifRegex(char *buffer, char *pattern);
  * 
  * @param buffer
  * @param pattern
+ * @param num_params
  * 
- * @return char*
+ * @return char**
  
 **/
 
-char *extractString(char *buffer, char *pattern);
+char **extractStrings(char *buffer, char *pattern, int num_params);
 
 
 

@@ -25,4 +25,4 @@ interface:
 	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium
 
 clean:
-	rm -rf Build/*
+	find Build/ ! \( -name '*.txt' -o -name '*.cfg' \) -type f -delete

@@ -94,7 +94,7 @@ void showAquarium(const Aquarium *aquarium)
     }
 }
 
-void addView(Aquarium *a, const char *name, int x, int y ,int width, int height)
+void addView(Aquarium *a, const char *name, int x, int y, int width, int height)
 {
     if (a == NULL)
         return;
@@ -335,43 +335,52 @@ int verifRegex(char *buffer, char *pattern)
     }
 }
 
-char **extractStrings(char *buffer, char *pattern, int num_params) {
+char **extractStrings(char *buffer, char *pattern, int num_params)
+{
     regex_t regex;
     int reti;
     char msgbuf[100];
     int len = strcspn(buffer, "\n");
     buffer[len] = '\0';
 
-    regmatch_t match[num_params+1];
+    regmatch_t match[num_params + 1];
 
     reti = regcomp(&regex, pattern, REG_EXTENDED);
 
-    if (reti) {
+    if (reti)
+    {
         fprintf(stderr, "Could not compile regex");
         return NULL;
     }
 
     // Tableau dynamique pour stocker les paramètres extraits
     char **params = (char **)malloc(num_params * sizeof(char *));
-    for (int i = 0; i < num_params; i++) {
+    for (int i = 0; i < num_params; i++)
+    {
         params[i] = NULL;
     }
 
-    reti = regexec(&regex, buffer, num_params+1, match, 0);
+    reti = regexec(&regex, buffer, num_params + 1, match, 0);
 
-    if (!reti) {
-        for (int i = 1; i <= num_params; i++) {
+    if (!reti)
+    {
+        for (int i = 1; i <= num_params; i++)
+        {
             int start = match[i].rm_so;
             int end = match[i].rm_eo;
             int size = end - start;
-            params[i-1] = (char *)malloc(size + 1);
-            strncpy(params[i-1], buffer + start, size);
-            params[i-1][size] = '\0';
+            params[i - 1] = (char *)malloc(size + 1);
+            strncpy(params[i - 1], buffer + start, size);
+            params[i - 1][size] = '\0';
         }
-    } else if (reti == REG_NOMATCH) {
+    }
+    else if (reti == REG_NOMATCH)
+    {
         free(params);
         params = NULL;
-    } else {
+    }
+    else
+    {
         regerror(reti, &regex, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Error during regex execution: %s\n", msgbuf);
         free(params);
@@ -382,8 +391,42 @@ char **extractStrings(char *buffer, char *pattern, int num_params) {
     return params;
 }
 
+char *extractString(char *buffer, char *pattern)
+{
+    regex_t regex;
+    int reti;
+    char msgbuf[100];
+    regmatch_t match[2];
+    int len = strcspn(buffer, "\n");
+    buffer[len] = '\0';
+    char *word = NULL;
 
+    reti = regcomp(&regex, pattern, REG_EXTENDED);
+    if (reti) {
+        regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+        fprintf(stderr, "Erreur lors de l'exécution de la recherche: %s\n", msgbuf);
+        regfree(&regex);
+        return NULL;
+    }
 
+    reti = regexec(&regex, buffer, 2, match, 0);
+    if (!reti && match[1].rm_so != -1 && match[1].rm_eo != -1) {
+        int start = match[1].rm_so;
+        int end = match[1].rm_eo;
+        int size = end - start;
+        word = (char *)malloc(size + 1);
+        if (!word) {
+            fprintf(stderr, "Erreur lors de l'allocation de mémoire\n");
+            regfree(&regex);
+            return NULL;
+        }
+        strncpy(word, buffer + start, size);
+        word[size] = '\0';
+    }
+
+    regfree(&regex);
+    return word;
+}
 
 char *status(Aquarium *aquarium, int client)
 {

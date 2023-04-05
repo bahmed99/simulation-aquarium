@@ -181,6 +181,18 @@ int verifRegex(char *buffer, char *pattern);
 char **extractStrings(char *buffer, char *pattern, int num_params);
 
 
+/**
+ * @brief extracter with regex
+ * 
+ * @param buffer
+ * @param pattern
+ * 
+ * @return char*
+ 
+**/
+
+char *extractString(char *buffer, char *pattern);
+
 
 /**
  * @brief return status of view for client 

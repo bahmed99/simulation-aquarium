@@ -21,13 +21,17 @@ char *extractServerCommand[] = {
 char *clientCommand[] = {
     "^hello( in as [a-zA-Z0-9]+)?$",
     "^addFish [a-zA-Z0-9]+ at [0-9]+x[0-9]+, [0-9]+x[0-9]+, [a-zA-Z]+$",
-     "^delFish [a-zA-Z0-9]+$"
+    "^delFish [a-zA-Z0-9]+$",
+    "^startFish [a-zA-Z0-9]+$"
+
 };
 
 char *extractClientCommand[] = {
     "^hello in as ([a-zA-Z0-9]+)$",
     "^addFish ([a-zA-Z0-9]+) at ([0-9]+)x([0-9]+), ([0-9]+)x([0-9]+), ([a-zA-Z]+)$",
-    "^delFish ([a-zA-Z0-9]+)$"
+    "^delFish ([a-zA-Z0-9]+)$",
+    "^startFish ([a-zA-Z0-9]+)$",
+
 
 };
 
@@ -123,8 +127,8 @@ void *ClientHandler(void *client_fd)
         }
        
         else if (verifRegex(buffer, clientCommand[2]) == 1)        {
-            char* name = extractStrings(buffer, extractClientCommand[1], 1)[0];
-            int status = delFish(aquarium, *(int *)client_fd, name);
+            char* name = extractStrings(buffer, extractClientCommand[2], 1)[0];
+            int status = deleteFish(aquarium, *(int *)client_fd, name);
             if (status == 1)
             {
                 length_write = write(*(int *)client_fd, "OK\n", 3);
@@ -134,10 +138,9 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
             }
         }
-        else if (strncmp(buffer, "startFish\n", strlen("startFish\n")) == 0)
-        {
-            length_write = write(*(int *)client_fd, "OK\n", 3);
-            // startFish();
+        else if (verifRegex(buffer, clientCommand[3]) == 1)        {
+            char* name = extractStrings(buffer, extractClientCommand[3], 1)[0];
+            //startFish()
         }
         else
         {
@@ -353,10 +356,10 @@ int ExtractPort()
 int main(int argc, char *argv[])
 {
     char port[5];
-    // sprintf(port, "%d", ExtractPort());
+    sprintf(port, "%d", ExtractPort());
     int ServSock;
     fd_set SocketSet;
-    int maxDescriptor = SocketsCreator(&ServSock, "12340");
+    int maxDescriptor = SocketsCreator(&ServSock, port);
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
         clients_fds[i] = 0;

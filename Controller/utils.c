@@ -218,39 +218,47 @@ int addFish(Aquarium *a, int client, char *name, int x , int y, int height, int 
     }
 }
 
-int deleteFish(Aquarium *a, int client, char *name)
+int deleteFish(Aquarium *a, int client, char *fishName)
 {
-    if (a != NULL)
+    int i, j, k;
+    View *v;
+    Fish *f;
 
+    for (i = 0; i < a->num_views; i++)
     {
-
-        int i;
-        for (i = 0; i < a->num_views; i++)
+        if (a->views[i].socket == client)
         {
-            if (a->views[i].socket == client)
+            v = &a->views[i];
+
+            for (j = 0; j < v->num_fishes; j++)
             {
-                int j;
-                for (j = 0; j < a->views[i].num_fishes; j++)
+                f = &v->fishes[j];
+
+                if (strcmp(f->name, fishName) == 0)
                 {
-                    if (strcmp(a->views[i].fishes[j].name, name) == 0)
+                    // Suppression du poisson
+                    for (k = j; k < v->num_fishes - 1; k++)
                     {
-                        int k ;
-                        for (k = j; k < a->views[i].num_fishes - 1; k++)
-                        {
-                            a->views[i].fishes[k] = a->views[i].fishes[k + 1];
-                        }
-                        a->views[i].num_fishes--;
-                        a->views[i].fishes = (Fish *)realloc(a->views[i].fishes, a->views[i].num_fishes * sizeof(Fish));
-                        return 1;
+                        v->fishes[k] = v->fishes[k + 1];
                     }
+
+                    v->num_fishes--;
+
+                    v->fishes = (Fish*) realloc(v->fishes, v->num_fishes * sizeof(Fish));
+
+                    if (v->fishes == NULL && v->num_fishes > 0) {
+                        return -1; 
+                    }
+
+                    return 1; // Suppression réussie
                 }
-                return 0;
             }
+
+            return 0; // Poisson non trouvé
         }
-        return 0;
     }
 
-    return 0;
+    return 0; // Client non trouvé
 }
 
 char *authenticate(char *id, Aquarium *aquarium, int socket)

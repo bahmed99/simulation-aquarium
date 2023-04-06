@@ -117,12 +117,13 @@ void saveAquarium(Aquarium *aquarium, char *aquariumName);
  * @param aquarium
  * @param client
  * @param name
- * @param coord
+ * @param x
+ * @param y
  * @param weight
  * @param height
  * @param mobilityPattern
  */
-int addFish(Aquarium *a, int client, char *name,Coordinates coord, int height, int weight, char *mobilityPattern);
+int addFish(Aquarium *a, int client, char *name, int x , int y, int height, int weight, char *mobilityPattern);
 
 /**
  * @brief Delete a fish from a view

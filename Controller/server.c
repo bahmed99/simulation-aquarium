@@ -20,10 +20,15 @@ char *extractServerCommand[] = {
 // regular expressions to handle client commands
 char *clientCommand[] = {
     "^hello( in as [a-zA-Z0-9]+)?$",
+    "^addFish [a-zA-Z0-9]+ at [0-9]+x[0-9]+, [0-9]+x[0-9]+, [a-zA-Z]+$",
+     "^delFish [a-zA-Z0-9]+$"
 };
 
 char *extractClientCommand[] = {
     "^hello in as ([a-zA-Z0-9]+)$",
+    "^addFish ([a-zA-Z0-9]+) at ([0-9]+)x([0-9]+), ([0-9]+)x([0-9]+), ([a-zA-Z]+)$",
+    "^delFish ([a-zA-Z0-9]+)$"
+
 };
 
 #define MAX_CLIENTS 4
@@ -90,15 +95,44 @@ void *ClientHandler(void *client_fd)
             length_write = write(*(int *)client_fd, auth, strlen(auth));
         }
         // add Fish
-        else if (strncmp(buffer, "addFish\n", strlen("addFish\n")) == 0)
+        else if (verifRegex(buffer, clientCommand[1]) == 1)
+        {
+        char **params = extractStrings(buffer, extractClientCommand[1], 6); 
+        char* name = params[0];
+        int x = atoi(params[1]);
+        int y = atoi(params[2]);
+        int width = atoi(params[3]);
+        int height = atoi(params[4]);
+        char* mobiliypattern = params[5];
+        //debugger
+        // printf("name : %s\n", name);
+        // printf("x : %d\n", x);
+        // printf("y : %d\n", y);
+        // printf("width : %d\n", width);
+        // printf("height : %d\n", height);
+        // printf("mobiliypattern : %s\n", mobiliypattern);
+        int status = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
+        if (status == 1)
         {
             length_write = write(*(int *)client_fd, "OK\n", 3);
-            // addFish();
         }
-        else if (strncmp(buffer, "delFish\n", strlen("delFish\n")) == 0)
+        else
         {
-            length_write = write(*(int *)client_fd, "OK\n", 3);
-            // delFish();
+            length_write = write(*(int *)client_fd, "NOK\n", 4);
+        }
+        }
+       
+        else if (verifRegex(buffer, clientCommand[2]) == 1)        {
+            char* name = extractStrings(buffer, extractClientCommand[1], 1)[0];
+            int status = delFish(aquarium, *(int *)client_fd, name);
+            if (status == 1)
+            {
+                length_write = write(*(int *)client_fd, "OK\n", 3);
+            }
+            else
+            {
+                length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
+            }
         }
         else if (strncmp(buffer, "startFish\n", strlen("startFish\n")) == 0)
         {
@@ -322,7 +356,7 @@ int main(int argc, char *argv[])
     // sprintf(port, "%d", ExtractPort());
     int ServSock;
     fd_set SocketSet;
-    int maxDescriptor = SocketsCreator(&ServSock, "12345");
+    int maxDescriptor = SocketsCreator(&ServSock, "12340");
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
         clients_fds[i] = 0;

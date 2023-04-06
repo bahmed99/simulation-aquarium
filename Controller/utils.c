@@ -180,14 +180,15 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-int addFish(Aquarium *a, int client, char *name, Coordinates coord, int height, int weight, char *mobilityPattern)
+int addFish(Aquarium *a, int client, char *name, int x , int y, int height, int weight, char *mobilityPattern)
 {
     if (a != NULL)
 
     {
         int test = 0;
         Fish newFish;
-        newFish.coord = coord;
+        newFish.coord.x = x;
+        newFish.coord.y = y;
         strcpy(newFish.name, name);
         newFish.width = weight;
         newFish.height = height;

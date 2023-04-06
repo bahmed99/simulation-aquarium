@@ -191,6 +191,7 @@ int addFish(Aquarium *a, int client, char *name, Coordinates coord, int height, 
         strcpy(newFish.name, name);
         newFish.width = weight;
         newFish.height = height;
+        newFish.mobile=0;
         strcpy(newFish.mobilityPattern, mobilityPattern);
         for (int i = 0; i < a->num_views; i++)
         {
@@ -468,7 +469,7 @@ char *status(Aquarium *aquarium, int client)
 
                 for (j = 0; j < aquarium->views[i].num_fishes; j++)
                 {
-                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile ? "started" : "notStarted");
+                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile==1 ? "started" : "notStarted");
                     strcat(fishes, tmp);
                 }
                 break;

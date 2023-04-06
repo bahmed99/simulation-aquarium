@@ -185,7 +185,7 @@ int addFish(Aquarium *a, int client, char *name, Coordinates coord, int height, 
     if (a != NULL)
 
     {
-        int test = 0;
+
         Fish newFish;
         newFish.coord = coord;
         strcpy(newFish.name, name);
@@ -196,48 +196,59 @@ int addFish(Aquarium *a, int client, char *name, Coordinates coord, int height, 
         {
             if (a->views[i].socket == client)
             {
+                int j;
+                for (j = 0; j < a->views[i].num_fishes; j++)
+                {
+                    if (strcmp(a->views[i].fishes[j].name, name) == 0)
+                    {
+                        return 0;
+                    }
+                }
                 a->views[i].fishes = (Fish *)realloc(a->views[i].fishes, (a->views[i].num_fishes + 1) * sizeof(Fish));
                 a->views[i].fishes[a->views[i].num_fishes] = newFish;
                 a->views[i].num_fishes++;
-                test = 1;
-                break;
+
+                return 1;
             }
         }
 
-        return test;
+        return 0;
     }
 }
 
-int deleteFish(Aquarium *a, char *viewName, char *name)
+int deleteFish(Aquarium *a, int client, char *name)
 {
     if (a != NULL)
 
     {
-        int test = 0;
 
-        for (int i = 0; i < a->num_views; i++)
+        int i;
+        for (i = 0; i < a->num_views; i++)
         {
-            if (strcmp(a->views[i].name, viewName) == 0)
+            if (a->views[i].socket == client)
             {
-                for (int j = 0; j < a->views[i].num_fishes; j++)
+                int j;
+                for (j = 0; j < a->views[i].num_fishes; j++)
                 {
                     if (strcmp(a->views[i].fishes[j].name, name) == 0)
                     {
-                        for (int k = j; k < a->views[i].num_fishes - 1; k++)
+                        int k ;
+                        for (k = j; k < a->views[i].num_fishes - 1; k++)
                         {
                             a->views[i].fishes[k] = a->views[i].fishes[k + 1];
                         }
                         a->views[i].num_fishes--;
-                        test = 1;
-                        break;
+                        a->views[i].fishes = (Fish *)realloc(a->views[i].fishes, a->views[i].num_fishes * sizeof(Fish));
+                        return 1;
                     }
                 }
-                break;
+                return 0;
             }
         }
-
-        return test;
+        return 0;
     }
+
+    return 0;
 }
 
 char *authenticate(char *id, Aquarium *aquarium, int socket)
@@ -402,7 +413,8 @@ char *extractString(char *buffer, char *pattern)
     char *word = NULL;
 
     reti = regcomp(&regex, pattern, REG_EXTENDED);
-    if (reti) {
+    if (reti)
+    {
         regerror(reti, &regex, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Erreur lors de l'exécution de la recherche: %s\n", msgbuf);
         regfree(&regex);
@@ -410,12 +422,14 @@ char *extractString(char *buffer, char *pattern)
     }
 
     reti = regexec(&regex, buffer, 2, match, 0);
-    if (!reti && match[1].rm_so != -1 && match[1].rm_eo != -1) {
+    if (!reti && match[1].rm_so != -1 && match[1].rm_eo != -1)
+    {
         int start = match[1].rm_so;
         int end = match[1].rm_eo;
         int size = end - start;
         word = (char *)malloc(size + 1);
-        if (!word) {
+        if (!word)
+        {
             fprintf(stderr, "Erreur lors de l'allocation de mémoire\n");
             regfree(&regex);
             return NULL;
@@ -467,4 +481,11 @@ char *status(Aquarium *aquarium, int client)
         free(tmp);
         return status;
     }
+}
+
+char *pong(char *port)
+{
+    char *pong = (char *)malloc(1000);
+    sprintf(pong, "pong %s", port);
+    return pong;
 }

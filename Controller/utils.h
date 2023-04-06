@@ -128,10 +128,10 @@ int addFish(Aquarium *a, int client, char *name,Coordinates coord, int height, i
  * @brief Delete a fish from a view
  *
  * @param aquarium
- * @param viewName
+ * @param client
  * @param fishName
  */
-int deleteFish(Aquarium *a, char *viewName, char *fishName);
+int deleteFish(Aquarium *a, int client, char *fishName);
 
 /**
  * @brief authentication
@@ -204,5 +204,14 @@ char *extractString(char *buffer, char *pattern);
 */
 
 char *status(Aquarium *aquarium, int client);
+
+
+/** 
+ * @brief return response of ping
+ * 
+ * @return char*
+*/
+
+char *pong(char *port);
 
 #endif

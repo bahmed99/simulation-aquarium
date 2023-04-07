@@ -110,13 +110,6 @@ void *ClientHandler(void *client_fd)
         int width = atoi(params[3]);
         int height = atoi(params[4]);
         char* mobiliypattern = params[5];
-        //debugger
-        // printf("name : %s\n", name);
-        // printf("x : %d\n", x);
-        // printf("y : %d\n", y);
-        // printf("width : %d\n", width);
-        // printf("height : %d\n", height);
-        // printf("mobiliypattern : %s\n", mobiliypattern);
         char* message = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
         length_write = write(*(int *)client_fd, message, strlen(message));
         }
@@ -176,7 +169,7 @@ void ServerAction(void *buffer)
     char *output[10];
     char *str_parse = malloc(100 * sizeof(char));
     // debug
-    printf("le contenu du buffer est : %s", (char *)buffer);
+    //printf("le contenu du buffer est : %s", (char *)buffer);
     // load aquarium
     if (verifRegex(buffer, serverCommand[0]) == 1)
     {
@@ -367,10 +360,10 @@ int ExtractPort()
 int main(int argc, char *argv[])
 {
     char port[5];
-    // sprintf(port, "%d", ExtractPort());
+    sprintf(port, "%d", ExtractPort());
     int ServSock;
     fd_set SocketSet;
-    int maxDescriptor = SocketsCreator(&ServSock, "12345");
+    int maxDescriptor = SocketsCreator(&ServSock, port);
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
         clients_fds[i] = 0;

@@ -54,7 +54,7 @@ Aquarium *loadAquarium(char *AquariumName)
 
         // Création d'une nouvelle vue et initialisation de ses membres à partir de la ligne lue
         View *new_view = (struct View *)malloc(sizeof(struct View));
-        sscanf(line, "%s %dx%d+%d+%d", new_view->name, &new_view->width, &new_view->height, &new_view->coord.x, &new_view->coord.y);
+        sscanf(line, "%s %dx%d+%d+%d", new_view->name,&new_view->coord.x, &new_view->coord.y, &new_view->width, &new_view->height);
 
         new_view->socket = -1;
         new_view->num_fishes = 0;
@@ -90,7 +90,7 @@ void showAquarium(const Aquarium *aquarium)
     for (int i = 0; i < aquarium->num_views; i++)
     {
         printf("%s ", aquarium->views[i].name);
-        printf("%dx%d+%d+%d\n", aquarium->views[i].width, aquarium->views[i].height, aquarium->views[i].coord.x, aquarium->views[i].coord.y);
+        printf("%dx%d+%d+%d\n", aquarium->views[i].coord.x, aquarium->views[i].coord.y , aquarium->views[i].width, aquarium->views[i].height);
     }
 }
 
@@ -180,7 +180,7 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-char* addFish(Aquarium *a, int client, char *name, int x , int y, int height, int weight, char *mobilityPattern)
+char* addFish(Aquarium *a, int client, char *name, int x , int y, int width, int height, char *mobilityPattern)
 {   
     char* message;
     if (a != NULL)
@@ -191,7 +191,7 @@ char* addFish(Aquarium *a, int client, char *name, int x , int y, int height, in
         newFish.coord.x = x;
         newFish.coord.y = y;
         strcpy(newFish.name, name);
-        newFish.width = weight;
+        newFish.width = width;
         newFish.height = height;
         newFish.mobile=0;
         strcpy(newFish.mobilityPattern, mobilityPattern);
@@ -200,19 +200,20 @@ char* addFish(Aquarium *a, int client, char *name, int x , int y, int height, in
             if (a->views[i].socket == client)
             {   
 
-                //Vérifier les coordonnées de fish par rapport aux dimensions de la view
-                if (x < 0 || x > a->views[i].width || y < 0 || y > a->views[i].height)
+                if (x < 0 || x + (width *  a->views[i].width /100) + a->views[i].coord.x > a->views[i].width || y < 0 || y + (height * a->views[i].height /100) + a->views[i].coord.y > a->views[i].height)
                 {   
     
-                    message = "Error : fish coordinates are out of view dimensions";
+                    message = "NOK: Les coordonnées du poisson sont en dehors des dimensions de vue\n";
                     return message;
                 }
+            
+               
                 int j;
                 for (j = 0; j < a->views[i].num_fishes; j++)
                 {
                     if (strcmp(a->views[i].fishes[j].name, name) == 0)
                     {    
-                        message = "Error : fish name already exists";
+                        message = "NOK : Le nom du poisson existe déjà\n";
                         return message;
                     }
                 }
@@ -220,12 +221,12 @@ char* addFish(Aquarium *a, int client, char *name, int x , int y, int height, in
                 a->views[i].fishes[a->views[i].num_fishes] = newFish;
                 a->views[i].num_fishes++;
 
-                message = "OK :Fish added successfully";
+                message = "OK\n";
                 return message;
             }
         }
 
-        message="NOK";
+        message="NOK : Le client n'a pas de vue\n";
         return message;
     }
 }

@@ -496,6 +496,6 @@ char *status(Aquarium *aquarium, int client)
 char *pong(char *port)
 {
     char *pong = (char *)malloc(1000);
-    sprintf(pong, "pong %s", port);
+    sprintf(pong, "pong %s\n", port);
     return pong;
 }

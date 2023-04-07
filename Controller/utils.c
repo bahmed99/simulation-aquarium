@@ -7,6 +7,7 @@
 
 Aquarium *loadAquarium(char *AquariumName)
 {
+    logger_init("log_controller.txt");
 
     char *extension = ".txt";
     char *filename = (char *)malloc(strlen(AquariumName) + strlen(extension) + 1);
@@ -21,9 +22,8 @@ Aquarium *loadAquarium(char *AquariumName)
     FILE *fp = fopen(filename, "r");
     if (fp == NULL)
     {
-        /** TODO: afficher dans un fichier de log **/
-        printf("Erreur: impossible d'ouvrir le fichier.\n");
 
+        logger_log(ERROR, "Impossible d'ouvrir le fichier %s", filename);
         return NULL;
     }
 
@@ -54,7 +54,7 @@ Aquarium *loadAquarium(char *AquariumName)
 
         // Création d'une nouvelle vue et initialisation de ses membres à partir de la ligne lue
         View *new_view = (struct View *)malloc(sizeof(struct View));
-        sscanf(line, "%s %dx%d+%d+%d", new_view->name,&new_view->coord.x, &new_view->coord.y, &new_view->width, &new_view->height);
+        sscanf(line, "%s %dx%d+%d+%d", new_view->name, &new_view->coord.x, &new_view->coord.y, &new_view->width, &new_view->height);
 
         new_view->socket = -1;
         new_view->num_fishes = 0;
@@ -74,146 +74,187 @@ Aquarium *loadAquarium(char *AquariumName)
 
     // Fermer le fichier
     fclose(fp);
+    logger_log(INFO, "Aquarium %s loaded (%d display view) !", aquarium->name, aquarium->num_views);
     printf("    -> aquarium loaded (%d display view) ! \n", aquarium->num_views);
+    logger_close();
     return aquarium;
 }
 
 void showAquarium(const Aquarium *aquarium)
 {
+    logger_init("log_controller.txt");
 
-    if (aquarium == NULL)
-        return;
-    // Afficher les dimensions de l'aquarium
-    printf("%dx%d\n", aquarium->dimensions[0], aquarium->dimensions[1]);
-
-    // Pour chaque vue de l'aquarium, afficher son nom et ses coordonnées
-    for (int i = 0; i < aquarium->num_views; i++)
+    if (aquarium != NULL)
     {
-        printf("%s ", aquarium->views[i].name);
-        printf("%dx%d+%d+%d\n", aquarium->views[i].coord.x, aquarium->views[i].coord.y , aquarium->views[i].width, aquarium->views[i].height);
+        // Afficher les dimensions de l'aquarium
+        printf("%dx%d\n", aquarium->dimensions[0], aquarium->dimensions[1]);
+
+        // Pour chaque vue de l'aquarium, afficher son nom et ses coordonnées
+        for (int i = 0; i < aquarium->num_views; i++)
+        {
+            printf("%s ", aquarium->views[i].name);
+            printf("%dx%d+%d+%d\n", aquarium->views[i].coord.x, aquarium->views[i].coord.y, aquarium->views[i].width, aquarium->views[i].height);
+        }
+        logger_log(INFO, "Aquarium %s displayed.", aquarium->name);
     }
+    else
+    {
+        logger_log(WARNING, "Aquarium is NULL");
+    }
+    logger_close();
 }
 
 void addView(Aquarium *a, const char *name, int x, int y, int width, int height)
 {
-    if (a == NULL)
-        return;
+    logger_init("log_controller.txt");
 
-    a->views = (View *)realloc(a->views, (a->num_views + 1) * sizeof(View));
-    View newView;
-    strcpy(newView.name, name);
-    newView.width = width;
-    newView.height = height;
-    newView.coord.x = x;
-    newView.coord.y = y;
-    newView.socket = -1;
-    newView.num_fishes = 0;
+    if (a != NULL)
+    {
 
-    // Ajouter la nouvelle vue à l'aquarium
-    a->views[a->num_views] = newView;
-    a->num_views++;
+        a->views = (View *)realloc(a->views, (a->num_views + 1) * sizeof(View));
+        View newView;
+        strcpy(newView.name, name);
+        newView.width = width;
+        newView.height = height;
+        newView.coord.x = x;
+        newView.coord.y = y;
+        newView.socket = -1;
+        newView.num_fishes = 0;
 
-    printf("    -> View %s added.\n", name);
+        // Ajouter la nouvelle vue à l'aquarium
+        a->views[a->num_views] = newView;
+        a->num_views++;
+
+        logger_log(INFO, "View %s added.", name);
+        printf("    -> View %s added.\n", name);
+    }
+    else
+    {
+        logger_log(WARNING, "Aquarium is NULL");
+    }
+    logger_close();
 }
 
 void deleteView(Aquarium *a, char *viewName)
 {
 
-    if (a == NULL)
-        return;
-
-    int index = -1;
-
-    // Rechercher l'index de la vue à supprimer
-    for (int i = 0; i < a->num_views; i++)
+    logger_init("log_controller.txt");
+    if (a != NULL)
     {
-        if (strcmp(a->views[i].name, viewName) == 0)
+
+        int index = -1;
+
+        // Rechercher l'index de la vue à supprimer
+        for (int i = 0; i < a->num_views; i++)
         {
-            index = i;
-            break;
+            if (strcmp(a->views[i].name, viewName) == 0)
+            {
+                index = i;
+                break;
+            }
         }
-    }
 
-    // Vérifier si la vue a été trouvée
-    if (index == -1)
+        // Vérifier si la vue a été trouvée
+        if (index == -1)
+        {
+            logger_log(ERROR, "View %s not found.", viewName);
+            return;
+        }
+
+        // Supprimer la vue à l'index spécifié
+        // free(a->views[index].fishes);
+        for (int i = index; i < a->num_views - 1; i++)
+        {
+            a->views[i] = a->views[i + 1];
+        }
+        a->num_views--;
+
+        logger_log(INFO, "View %s deleted.", viewName);
+        printf("    -> View %s deleted.\n", viewName);
+    }
+    else
     {
-        printf("Erreur : la vue %s n'existe pas.\n", viewName);
-        return;
+        logger_log(WARNING, "Aquarium is NULL");
     }
-
-    // Supprimer la vue à l'index spécifié
-    // free(a->views[index].fishes);
-    for (int i = index; i < a->num_views - 1; i++)
-    {
-        a->views[i] = a->views[i + 1];
-    }
-    a->num_views--;
-
-    printf("    -> View %s deleted.\n", viewName);
+    logger_close();
 }
 
 void saveAquarium(Aquarium *a, char *aquariumName)
 {
-    if (a == NULL)
-        return;
 
-    // Ouvrir le fichier en mode écriture
-    char *extension = ".txt";
-    char *filename = (char *)malloc(strlen(aquariumName) + strlen(extension) + 1);
-    strcpy(filename, aquariumName);
-    strcat(filename, extension);
+    logger_init("log_controller.txt");
 
-    int fd = open(filename, O_CREAT | O_RDWR, 0666);
-
-    // Écrire les dimensions de l'aquarium dans le fichier
-    dprintf(fd, "%dx%d\n", a->dimensions[0], a->dimensions[1]);
-
-    // Écrire les vues de l'aquarium dans le fichier
-    for (int i = 0; i < a->num_views; i++)
+    if (a != NULL)
     {
-        dprintf(fd, "%s %dx%d+%d+%d\n", a->views[i].name, a->views[i].width, a->views[i].height, a->views[i].coord.x, a->views[i].coord.y);
+
+        // Ouvrir le fichier en mode écriture
+        char *extension = ".txt";
+        char *filename = (char *)malloc(strlen(aquariumName) + strlen(extension) + 1);
+        strcpy(filename, aquariumName);
+        strcat(filename, extension);
+
+        int fd = open(filename, O_CREAT | O_RDWR, 0666);
+
+        // Écrire les dimensions de l'aquarium dans le fichier
+        dprintf(fd, "%dx%d\n", a->dimensions[0], a->dimensions[1]);
+
+        // Écrire les vues de l'aquarium dans le fichier
+        for (int i = 0; i < a->num_views; i++)
+        {
+            dprintf(fd, "%s %dx%d+%d+%d\n", a->views[i].name, a->views[i].width, a->views[i].height, a->views[i].coord.x, a->views[i].coord.y);
+        }
+
+        close(fd);
+        free(filename);
+
+        printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
+        logger_log(INFO, "Aquarium %s saved (%d display view)!", a->name, a->num_views);
+    }
+    else
+    {
+        logger_log(WARNING, "Aquarium is NULL");
     }
 
-    close(fd);
-    free(filename);
-
-    printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
+    logger_close();
 }
 
-char* addFish(Aquarium *a, int client, char *name, int x , int y, int width, int height, char *mobilityPattern)
-{   
-    char* message;
+char *addFish(Aquarium *a, int client, char *name, int x, int y, int width, int height, char *mobilityPattern)
+{
+    logger_init("log_controller.txt");
+    char *message;
     if (a != NULL)
 
     {
-
         Fish newFish;
         newFish.coord.x = x;
         newFish.coord.y = y;
         strcpy(newFish.name, name);
         newFish.width = width;
         newFish.height = height;
-        newFish.mobile=0;
+        newFish.mobile = 0;
         strcpy(newFish.mobilityPattern, mobilityPattern);
         for (int i = 0; i < a->num_views; i++)
         {
             if (a->views[i].socket == client)
-            {   
+            {
 
-                if (x < 0 || x + (width *  a->views[i].width /100) + a->views[i].coord.x > a->views[i].width || y < 0 || y + (height * a->views[i].height /100) + a->views[i].coord.y > a->views[i].height)
-                {   
-    
+                if (x < 0 || x + (width * a->views[i].width / 100) + a->views[i].coord.x > a->views[i].width || y < 0 || y + (height * a->views[i].height / 100) + a->views[i].coord.y > a->views[i].height)
+                {
+
                     message = "NOK: Les coordonnées du poisson sont en dehors des dimensions de vue\n";
+                    logger_log(WARNING, "Fish %s coordinates are out of view %s dimensions", name, a->views[i].name);
+                    logger_close();
                     return message;
                 }
-            
-               
+
                 int j;
                 for (j = 0; j < a->views[i].num_fishes; j++)
                 {
                     if (strcmp(a->views[i].fishes[j].name, name) == 0)
-                    {    
+                    {
                         message = "NOK : Le nom du poisson existe déjà\n";
+                        logger_log(WARNING, "Fish %s already exists", name);
+                        logger_close();
                         return message;
                     }
                 }
@@ -222,20 +263,26 @@ char* addFish(Aquarium *a, int client, char *name, int x , int y, int width, int
                 a->views[i].num_fishes++;
 
                 message = "OK\n";
+                logger_log(INFO, "Fish %s added to view %s", name, a->views[i].name);
+                logger_close();
                 return message;
             }
         }
-
-        message="NOK : Le client n'a pas de vue\n";
-        return message;
     }
+    message = "NOK : Le client n'a pas de vue\n";
+    logger_log(WARNING, "Client %d has no view", client);
+    logger_close();
+    return message;
 }
 
 int deleteFish(Aquarium *a, int client, char *fishName)
 {
+    
     int i, j, k;
     View *v;
     Fish *f;
+
+    logger_init("log_controller.txt");
 
     for (i = 0; i < a->num_views; i++)
     {
@@ -257,25 +304,37 @@ int deleteFish(Aquarium *a, int client, char *fishName)
 
                     v->num_fishes--;
 
-                    v->fishes = (Fish*) realloc(v->fishes, v->num_fishes * sizeof(Fish));
+                    v->fishes = (Fish *)realloc(v->fishes, v->num_fishes * sizeof(Fish));
 
-                    if (v->fishes == NULL && v->num_fishes > 0) {
-                        return -1; 
+                    if (v->fishes == NULL && v->num_fishes > 0)
+                    {
+                        logger_log(ERROR, "Fish %s not deleted", fishName);
+                        logger_close();
+                        return -1;
                     }
 
+                    logger_log(INFO, "Fish %s deleted", fishName);
+                    logger_close();
                     return 1; // Suppression réussie
                 }
             }
+
+            logger_log(WARNING, "Fish %s not found", fishName);
+            logger_close();
 
             return 0; // Poisson non trouvé
         }
     }
 
+    
+    logger_log(WARNING, "Client %d has no view", client);
+    logger_close();
     return 0; // Client non trouvé
 }
 
 char *authenticate(char *id, Aquarium *aquarium, int socket)
 {
+    logger_init("log_controller.txt");
     if (aquarium != NULL)
 
     {
@@ -289,6 +348,8 @@ char *authenticate(char *id, Aquarium *aquarium, int socket)
                 if (strcmp(aquarium->views[i].name, id) == 0 && aquarium->views[i].socket == -1)
                 {
                     aquarium->views[i].socket = socket;
+                    logger_log(INFO, "Client %d connected to view %s", socket, id);
+                    logger_close();
 
                     return id;
                 }
@@ -302,10 +363,15 @@ char *authenticate(char *id, Aquarium *aquarium, int socket)
             {
 
                 aquarium->views[j].socket = socket;
+                logger_log(INFO, "Client %d connected to view %s", socket, aquarium->views[j].name);
+                logger_close();
 
                 return aquarium->views[j].name;
             }
         }
+    
+        logger_log(WARNING, "No view available for client %d", socket);
+        logger_close();
 
         return NULL;
     }
@@ -313,6 +379,7 @@ char *authenticate(char *id, Aquarium *aquarium, int socket)
 
 void disconnect(Aquarium *aquarium, int client_socket)
 {
+    logger_init("log_controller.txt");
     if (aquarium != NULL)
     {
         int i;
@@ -321,6 +388,7 @@ void disconnect(Aquarium *aquarium, int client_socket)
             if (aquarium->views[i].socket == client_socket)
             {
                 aquarium->views[i].socket = -1;
+                logger_log(INFO, "Client %d disconnected from view %s", client_socket, aquarium->views[i].name);
                 break;
             }
         }
@@ -329,9 +397,13 @@ void disconnect(Aquarium *aquarium, int client_socket)
         if (aquarium->views[i].num_fishes != 0)
         {
             aquarium->views[i].num_fishes = 0;
+
+
             free(aquarium->views[i].fishes);
         }
     }
+
+    logger_close();
 }
 
 int verifRegex(char *buffer, char *pattern)
@@ -466,7 +538,9 @@ char *extractString(char *buffer, char *pattern)
 }
 
 char *status(Aquarium *aquarium, int client)
+
 {
+    logger_init("log_controller.txt");
     if (aquarium != NULL)
     {
         char *status = (char *)malloc(1000);
@@ -482,23 +556,33 @@ char *status(Aquarium *aquarium, int client)
                 if (aquarium->views[i].num_fishes == 0)
                 {
                     sprintf(status, "OK : Connecté au contrôleur, 0 poisson trouvé\n");
+                    logger_log(INFO,"OK : Connecté au contrôleur, 0 poisson trouvé\n");
                     free(fishes);
                     free(tmp);
+                    
+
+
+                    logger_close();
                     return status;
                 }
 
                 sprintf(status, "OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
+                logger_log(INFO,"OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
+
+
 
                 for (j = 0; j < aquarium->views[i].num_fishes; j++)
                 {
-                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile==1 ? "started" : "notStarted");
+                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile == 1 ? "started" : "notStarted");
                     strcat(fishes, tmp);
                 }
                 break;
             }
         }
 
+        
         strcat(status, fishes);
+        logger_close();
 
         free(fishes);
         free(tmp);
@@ -508,6 +592,7 @@ char *status(Aquarium *aquarium, int client)
 
 char *pong(char *port)
 {
+    
     char *pong = (char *)malloc(1000);
     sprintf(pong, "pong %s\n", port);
     return pong;

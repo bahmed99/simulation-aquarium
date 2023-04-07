@@ -14,7 +14,7 @@
 #include <signal.h>
 #include <regex.h>
 #include <sys/mman.h>
-
+#include "logger.h"
 
 
 /********* Déclaration des structures *********/

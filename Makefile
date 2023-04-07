@@ -5,16 +5,16 @@ CFALGS=-Wall
 
 all: utils test view
 
-utils: 
+utils: logger_controller
 	$(CC) $(CFLAGS) -c Controller/utils.c -o $(BUILD_DIR)/utils.o
 
 test: utils
 	$(CC) $(CFLAGS) -c Controller/test.c -o $(BUILD_DIR)/test.o
 	$(CC) $(CFLAGS) $(BUILD_DIR)/test.o $(BUILD_DIR)/utils.o -o $(BUILD_DIR)/test
 
-server: utils
+server: utils logger_controller
 	$(CC) $(CFLAGS) -c Controller/server.c -o $(BUILD_DIR)/server.o
-	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o -o $(BUILD_DIR)/server
+	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
 	javac -d $(BUILD_DIR) View/Client.java 
@@ -23,6 +23,10 @@ view:
 interface:
 	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java
 	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium
+
+
+logger_controller:
+	$(CC) $(CFLAGS) -c Controller/logger.c -o $(BUILD_DIR)/logger_controller.o
 
 clean:
 	find Build/ ! \( -name '*.txt' -o -name '*.cfg' \) -type f -delete

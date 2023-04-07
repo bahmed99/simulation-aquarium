@@ -115,15 +115,8 @@ void *ClientHandler(void *client_fd)
         // printf("width : %d\n", width);
         // printf("height : %d\n", height);
         // printf("mobiliypattern : %s\n", mobiliypattern);
-        int status = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
-        if (status == 1)
-        {
-            length_write = write(*(int *)client_fd, "OK\n", 3);
-        }
-        else
-        {
-            length_write = write(*(int *)client_fd, "NOK\n", 4);
-        }
+        char* message = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
+        length_write = write(*(int *)client_fd, message, strlen(message));
         }
        
         else if (verifRegex(buffer, clientCommand[2]) == 1)        {

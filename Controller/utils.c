@@ -180,8 +180,9 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     printf("    -> Aquarium saved (%d display view)!\n", a->num_views);
 }
 
-int addFish(Aquarium *a, int client, char *name, int x , int y, int height, int weight, char *mobilityPattern)
-{
+char* addFish(Aquarium *a, int client, char *name, int x , int y, int height, int weight, char *mobilityPattern)
+{   
+    char* message;
     if (a != NULL)
 
     {
@@ -197,24 +198,35 @@ int addFish(Aquarium *a, int client, char *name, int x , int y, int height, int 
         for (int i = 0; i < a->num_views; i++)
         {
             if (a->views[i].socket == client)
-            {
+            {   
+
+                //Vérifier les coordonnées de fish par rapport aux dimensions de la view
+                if (x < 0 || x > a->views[i].width || y < 0 || y > a->views[i].height)
+                {   
+    
+                    message = "Error : fish coordinates are out of view dimensions";
+                    return message;
+                }
                 int j;
                 for (j = 0; j < a->views[i].num_fishes; j++)
                 {
                     if (strcmp(a->views[i].fishes[j].name, name) == 0)
-                    {
-                        return 0;
+                    {    
+                        message = "Error : fish name already exists";
+                        return message;
                     }
                 }
                 a->views[i].fishes = (Fish *)realloc(a->views[i].fishes, (a->views[i].num_fishes + 1) * sizeof(Fish));
                 a->views[i].fishes[a->views[i].num_fishes] = newFish;
                 a->views[i].num_fishes++;
 
-                return 1;
+                message = "OK :Fish added successfully";
+                return message;
             }
         }
 
-        return 0;
+        message="NOK";
+        return message;
     }
 }
 

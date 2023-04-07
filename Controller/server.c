@@ -22,7 +22,9 @@ char *clientCommand[] = {
     "^hello( in as [a-zA-Z0-9]+)?$",
     "^addFish [a-zA-Z0-9]+ at [0-9]+x[0-9]+, [0-9]+x[0-9]+, [a-zA-Z]+$",
     "^delFish [a-zA-Z0-9]+$",
-    "^startFish [a-zA-Z0-9]+$"
+    "^startFish [a-zA-Z0-9]+$",
+    "^ping [0-9]{1,5}$",
+    "log out"
 
 };
 
@@ -31,7 +33,7 @@ char *extractClientCommand[] = {
     "^addFish ([a-zA-Z0-9]+) at ([0-9]+)x([0-9]+), ([0-9]+)x([0-9]+), ([a-zA-Z]+)$",
     "^delFish ([a-zA-Z0-9]+)$",
     "^startFish ([a-zA-Z0-9]+)$",
-
+    "^ping ([0-9]{1,5})$"
 
 };
 
@@ -79,11 +81,11 @@ void *ClientHandler(void *client_fd)
         }
         else if (verifRegex(buffer, clientCommand[0]) == 1)
         {
-            
+
             char *id;
 
             id = extractString(buffer, extractClientCommand[0]);
-            
+
             char *msg = authenticate(id, aquarium, *(int *)client_fd);
             char auth[256];
 
@@ -118,9 +120,10 @@ void *ClientHandler(void *client_fd)
         char* message = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
         length_write = write(*(int *)client_fd, message, strlen(message));
         }
-       
-        else if (verifRegex(buffer, clientCommand[2]) == 1)        {
-            char* name = extractStrings(buffer, extractClientCommand[2], 1)[0];
+
+        else if (verifRegex(buffer, clientCommand[2]) == 1)
+        {
+            char *name = extractStrings(buffer, extractClientCommand[2], 1)[0];
             int status = deleteFish(aquarium, *(int *)client_fd, name);
             if (status == 1)
             {
@@ -131,9 +134,24 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
             }
         }
-        else if (verifRegex(buffer, clientCommand[3]) == 1)        {
-            char* name = extractStrings(buffer, extractClientCommand[3], 1)[0];
-            //startFish()
+        else if (verifRegex(buffer, clientCommand[3]) == 1)
+        {
+            char *name = extractStrings(buffer, extractClientCommand[3], 1)[0];
+            // startFish()
+        }
+        else if (verifRegex(buffer, clientCommand[4]) == 1)
+        {
+            char *name = extractStrings(buffer, extractClientCommand[4], 1)[0];
+            char *msg = pong(name);
+            length_write = write(*(int *)client_fd, msg, strlen(msg));
+            free(msg);
+        }
+        else if (verifRegex(buffer, clientCommand[5]) == 1)
+        {
+            disconnect(aquarium, *(int *)client_fd);
+            length_write = write(*(int *)client_fd, "bye\n", 4);
+            close(*(int *)client_fd);
+            pthread_exit(NULL);
         }
         else
         {
@@ -349,10 +367,10 @@ int ExtractPort()
 int main(int argc, char *argv[])
 {
     char port[5];
-    sprintf(port, "%d", ExtractPort());
+    // sprintf(port, "%d", ExtractPort());
     int ServSock;
     fd_set SocketSet;
-    int maxDescriptor = SocketsCreator(&ServSock, port);
+    int maxDescriptor = SocketsCreator(&ServSock, "12345");
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
         clients_fds[i] = 0;

@@ -23,6 +23,7 @@ Aquarium *loadAquarium(char *AquariumName)
     if (fp == NULL)
     {
 
+        printf("    -> Impossible d'ouvrir le fichier %s \n", filename);
         logger_log(ERROR, "Impossible d'ouvrir le fichier %s", filename);
         return NULL;
     }
@@ -99,6 +100,7 @@ void showAquarium(const Aquarium *aquarium)
     }
     else
     {
+        printf("    -> Aquarium is NULL \n");
         logger_log(WARNING, "Aquarium is NULL");
     }
     logger_close();
@@ -130,6 +132,7 @@ void addView(Aquarium *a, const char *name, int x, int y, int width, int height)
     }
     else
     {
+        printf("    -> Aquarium is NULL \n");
         logger_log(WARNING, "Aquarium is NULL");
     }
     logger_close();
@@ -174,6 +177,7 @@ void deleteView(Aquarium *a, char *viewName)
     }
     else
     {
+        printf("    -> Aquarium is NULL \n");
         logger_log(WARNING, "Aquarium is NULL");
     }
     logger_close();
@@ -212,6 +216,7 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     }
     else
     {
+        printf("    -> Aquarium is NULL \n");
         logger_log(WARNING, "Aquarium is NULL");
     }
 

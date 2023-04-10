@@ -541,6 +541,7 @@ char *status(Aquarium *aquarium, int client)
 
 {
     logger_init("log_controller.txt");
+    int test=0;
     if (aquarium != NULL)
     {
         char *status = (char *)malloc(1000);
@@ -576,10 +577,20 @@ char *status(Aquarium *aquarium, int client)
                     sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile == 1 ? "started" : "notStarted");
                     strcat(fishes, tmp);
                 }
+                test=1;
                 break;
             }
         }
 
+        if(test==0)
+        {
+            sprintf(status, "NOK : Vous n'êtes pas connecté au contrôleur\n");
+            logger_log(ERROR,"ERROR : Vous n'êtes pas connecté au contrôleur\n");
+            free(fishes);
+            free(tmp);
+            logger_close();
+            return status;
+        }
         
         strcat(status, fishes);
         logger_close();

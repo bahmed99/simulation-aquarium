@@ -215,4 +215,14 @@ char *status(Aquarium *aquarium, int client);
 
 char *pong(char *port);
 
+
+/**
+ * @brief return response of startFish
+ * 
+ * @return char*
+ *
+*/
+
+char *startFish(Aquarium *aquarium, int client, char *fishName);
+
 #endif

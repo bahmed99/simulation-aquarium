@@ -17,19 +17,47 @@ public Client(String host, int port) throws IOException {
     in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 }
 
-public void run() throws IOException {
-    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-    String userInput;
+public void start() {
+    Thread receiveThread = new Thread(() -> {
+        try {
+            char[] buffer = new char[1024];
+            int bytesRead;
+              while ((bytesRead = in.read(buffer)) != -1) {
+                String response = new String(buffer, 0, bytesRead);
+                System.out.print("  -> ");
+                System.out.println(response.trim());
+                
 
-    System.out.print("$ ");
-    while ((userInput = stdIn.readLine()) != null) {
-        out.println(userInput);
-        String response = in.readLine();
-        System.out.println("    -> " + response);
-        System.out.print("$ ");
+                System.out.print("$ ");
+            }
+        } catch (IOException e) {
+            System.err.println("Error receiving message: " + e.getMessage());
+        }
+    });
+
+    Thread sendThread = new Thread(() -> {
+        try {
+            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+            String userInput;
+            System.out.print("$ ");
+            while ((userInput = stdIn.readLine()) != null) {
+                out.println(userInput);
+            }
+        } catch (IOException e) {
+            System.err.println("Error sending message: " + e.getMessage());
+        }
+    });
+
+    receiveThread.start();
+    sendThread.start();
+
+    try {
+        receiveThread.join();
+        sendThread.join();
+    } catch (InterruptedException e) {
+        System.err.println("Error joining threads: " + e.getMessage());
     }
 }
-
 
 public void close() {
     try {
@@ -61,11 +89,10 @@ public static void main(String[] args) {
         int port = Integer.parseInt(controller_port);
 
         Client client = new Client(server, port);
-        client.run();
+        client.start();
 
-    } catch (Exception e) { 
+    } catch (Exception e) {
         System.err.println("Error loading config file: " + e.getMessage());
     }
 }
-
 }

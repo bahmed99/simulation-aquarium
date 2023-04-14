@@ -10,7 +10,7 @@ utils: logger_controller
 
 test: utils
 	$(CC) $(CFLAGS) -c Controller/test.c -o $(BUILD_DIR)/test.o
-	$(CC) $(CFLAGS) $(BUILD_DIR)/test.o $(BUILD_DIR)/utils.o -o $(BUILD_DIR)/test
+	$(CC) $(CFLAGS) $(BUILD_DIR)/test.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/test
 
 server: utils logger_controller
 	$(CC) $(CFLAGS) -c Controller/server.c -o $(BUILD_DIR)/server.o

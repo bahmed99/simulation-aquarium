@@ -24,7 +24,7 @@ char *clientCommand[] = {
     "^delFish [a-zA-Z0-9]+$",
     "^startFish [a-zA-Z0-9]+$",
     "^ping [0-9]{1,5}$",
-    "log out"
+    "log out",
 
 };
 
@@ -33,8 +33,7 @@ char *extractClientCommand[] = {
     "^addFish ([a-zA-Z0-9]+) at ([0-9]+)x([0-9]+), ([0-9]+)x([0-9]+), ([a-zA-Z]+)$",
     "^delFish ([a-zA-Z0-9]+)$",
     "^startFish ([a-zA-Z0-9]+)$",
-    "^ping ([0-9]{1,5})$"
-
+    "^ping ([0-9]{1,5})$",
 };
 
 #define MAX_CLIENTS 4
@@ -63,6 +62,7 @@ void *ClientHandler(void *client_fd)
 {
     char buffer[256];
     int length_write;
+    
 
     while (1)
     {
@@ -127,17 +127,21 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
             }
         }
-        else if (verifRegex(buffer, clientCommand[3]) == 1)
-        {
-            char *name = extractStrings(buffer, extractClientCommand[3], 1)[0];
-            // startFish()
-        }
         else if (verifRegex(buffer, clientCommand[4]) == 1)
         {
             char *name = extractStrings(buffer, extractClientCommand[4], 1)[0];
             char *msg = pong(name);
             length_write = write(*(int *)client_fd, msg, strlen(msg));
             free(msg);
+        }
+        else if(verifRegex(buffer, clientCommand[3]) == 1)
+        {
+            char *name = extractStrings(buffer, extractClientCommand[3], 1)[0];
+
+            char *msg = startFish(aquarium, *(int *)client_fd, name);
+
+            length_write = write(*(int *)client_fd, msg, strlen(msg));
+            
         }
         else if (verifRegex(buffer, clientCommand[5]) == 1)
         {

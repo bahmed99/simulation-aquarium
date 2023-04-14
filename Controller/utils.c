@@ -549,10 +549,12 @@ char *status(Aquarium *aquarium, int client)
     int test=0;
     if (aquarium != NULL)
     {
-        char *status = (char *)malloc(1000);
+        char *status = (char *)malloc(5000);
         char *fishes = (char *)malloc(1000);
         char *tmp = (char *)malloc(1000);
         int i, j;
+
+        strcpy(fishes, "");
 
         for (i = 0; i < aquarium->num_views; i++)
         {
@@ -565,8 +567,6 @@ char *status(Aquarium *aquarium, int client)
                     logger_log(INFO,"OK : Connecté au contrôleur, 0 poisson trouvé\n");
                     free(fishes);
                     free(tmp);
-                    
-
 
                     logger_close();
                     return status;
@@ -579,7 +579,7 @@ char *status(Aquarium *aquarium, int client)
 
                 for (j = 0; j < aquarium->views[i].num_fishes; j++)
                 {
-                    sprintf(tmp, "Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile == 1 ? "started" : "notStarted");
+                    sprintf(tmp, "  Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile == 1 ? "started" : "notStarted");
                     strcat(fishes, tmp);
                 }
                 test=1;
@@ -604,6 +604,7 @@ char *status(Aquarium *aquarium, int client)
         free(tmp);
         return status;
     }
+
 }
 
 char *pong(char *port)
@@ -612,4 +613,55 @@ char *pong(char *port)
     char *pong = (char *)malloc(1000);
     sprintf(pong, "pong %s\n", port);
     return pong;
+}
+
+
+char *startFish(Aquarium *aquarium, int client, char *fishName){
+
+    logger_init("log_controller.txt");
+    int test=0;
+    if (aquarium != NULL)
+    {
+        char *startFish = (char *)malloc(1000);
+        int i, j;
+
+        for (i = 0; i < aquarium->num_views; i++)
+        {
+            if (aquarium->views[i].socket == client)
+            {
+                for (j = 0; j < aquarium->views[i].num_fishes; j++)
+                {
+                    if (strcmp(aquarium->views[i].fishes[j].name, fishName) == 0)
+                    {
+                        if (aquarium->views[i].fishes[j].mobile == 1)
+                        {
+                            sprintf(startFish, "NOK : Le poisson %s est déjà en mouvement\n", fishName);
+                            logger_log(ERROR,"NOK : Le poisson %s est déjà en mouvement\n", fishName);
+                            logger_close();
+                            return startFish;
+                        }
+                        else
+                        {
+                            aquarium->views[i].fishes[j].mobile = 1;
+                            sprintf(startFish, "OK : Le poisson %s est en mouvement\n", fishName);
+                            logger_log(INFO,"OK : Le poisson %s est en mouvement\n", fishName);
+                            logger_close();
+                            return startFish;
+                        }
+                    }
+                }
+                sprintf(startFish, "NOK : Le poisson %s n'a pas été trouvé\n", fishName);
+                logger_log(ERROR,"NOK : Le poisson %s n'a pas été trouvé\n", fishName);
+                logger_close();
+                return startFish;
+            }
+        }
+        if(test==0)
+        {
+            sprintf(startFish, "NOK : Vous n'êtes pas connecté au serveur\n");
+            logger_log(ERROR,"NOK : Vous n'êtes pas connecté au serveur\n");
+            logger_close();
+            return startFish;
+        }
+    }
 }

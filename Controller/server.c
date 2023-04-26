@@ -62,108 +62,136 @@ void *ClientHandler(void *client_fd)
 {
     char buffer[256];
     int length_write;
-    
 
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(*(int *)client_fd, &read_fds);
+
+    // Set a timeout of 60 seconds
+    struct timeval timeout;
+    timeout.tv_sec = 60;
+    timeout.tv_usec = 0;
     while (1)
     {
-        int length = read(*(int *)client_fd, buffer, 255);
-
-        if (length < 0)
+        int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
+        if (result == -1)
         {
-            printf("ERROR reading from socket\n");
+            printf("ERROR in select(): %s\n", strerror(errno));
             exit(1);
         }
-        if (strncmp(buffer, "status\n", strlen("status\n")) == 0)
+        else if (result == 0)
         {
-            char *msg = status(aquarium, *(int *)client_fd);
-            length_write = write(*(int *)client_fd, msg, strlen(msg));
-            free(msg);
-        }
-        else if (verifRegex(buffer, clientCommand[0]) == 1)
-        {
-
-            char *id;
-
-            id = extractString(buffer, extractClientCommand[0]);
-
-            char *msg = authenticate(id, aquarium, *(int *)client_fd);
-            char auth[256];
-
-            if (msg == NULL)
-            {
-                msg = "no greeting \n";
-            }
-            else
-            {
-                sprintf(auth, "greeting %s \n", msg);
-            }
-
-            length_write = write(*(int *)client_fd, auth, strlen(auth));
-        }
-        // add Fish
-        else if (verifRegex(buffer, clientCommand[1]) == 1)
-        {
-        char **params = extractStrings(buffer, extractClientCommand[1], 6); 
-        char* name = params[0];
-        int x = atoi(params[1]);
-        int y = atoi(params[2]);
-        int width = atoi(params[3]);
-        int height = atoi(params[4]);
-        char* mobiliypattern = params[5];
-        char* message = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
-        length_write = write(*(int *)client_fd, message, strlen(message));
-        }
-
-        else if (verifRegex(buffer, clientCommand[2]) == 1)
-        {
-            char *name = extractStrings(buffer, extractClientCommand[2], 1)[0];
-            int status = deleteFish(aquarium, *(int *)client_fd, name);
-            if (status == 1)
-            {
-                length_write = write(*(int *)client_fd, "OK\n", 3);
-            }
-            else
-            {
-                length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
-            }
-        }
-        else if (verifRegex(buffer, clientCommand[4]) == 1)
-        {
-            char *name = extractStrings(buffer, extractClientCommand[4], 1)[0];
-            char *msg = pong(name);
-            length_write = write(*(int *)client_fd, msg, strlen(msg));
-            free(msg);
-        }
-        else if(verifRegex(buffer, clientCommand[3]) == 1)
-        {
-            char *name = extractStrings(buffer, extractClientCommand[3], 1)[0];
-
-            char *msg = startFish(aquarium, *(int *)client_fd, name);
-
-            length_write = write(*(int *)client_fd, msg, strlen(msg));
-            
-        }
-        else if (verifRegex(buffer, clientCommand[5]) == 1)
-        {
-            disconnect(aquarium, *(int *)client_fd);
-            length_write = write(*(int *)client_fd, "bye\n", 4);
-            close(*(int *)client_fd);
-            pthread_exit(NULL);
-        }
-        else
-        {
-            length_write = write(*(int *)client_fd, "NOK : commande introuvable\n", strlen("NOK : commande introuvable\n"));
-        }
-
-        if (length == 0)
-        {
-
-            // Client has disconnected, close the socket and exit the thread
+            write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
             disconnect(aquarium, *(int *)client_fd);
             close(*(int *)client_fd);
             pthread_exit(NULL);
         }
+        else if (FD_ISSET(*(int *)client_fd, &read_fds))
+        {
+            int length = read(*(int *)client_fd, buffer, 255);
+            if (length < 0)
+            {
+                printf("ERROR reading from socket\n");
+                exit(1);
+            }
+            if (strncmp(buffer, "status\n", strlen("status\n")) == 0)
+            {
+                char *msg = status(aquarium, *(int *)client_fd);
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+                free(msg);
+            }
+            else if (verifRegex(buffer, clientCommand[0]) == 1)
+            {
+
+                char *id;
+
+                id = extractString(buffer, extractClientCommand[0]);
+
+                char *msg = authenticate(id, aquarium, *(int *)client_fd);
+                char auth[256];
+
+                if (msg == NULL)
+                {
+                    msg = "no greeting \n";
+                }
+                else
+                {
+                    sprintf(auth, "greeting %s \n", msg);
+                }
+
+                length_write = write(*(int *)client_fd, auth, strlen(auth));
+            }
+            // add Fish
+            else if (verifRegex(buffer, clientCommand[1]) == 1)
+            {
+                char **params = extractStrings(buffer, extractClientCommand[1], 6);
+                char *name = params[0];
+                int x = atoi(params[1]);
+                int y = atoi(params[2]);
+                int width = atoi(params[3]);
+                int height = atoi(params[4]);
+                char *mobiliypattern = params[5];
+                char *message = addFish(aquarium, *(int *)client_fd, name, x, y, width, height, mobiliypattern);
+                length_write = write(*(int *)client_fd, message, strlen(message));
+            }
+
+            else if (verifRegex(buffer, clientCommand[2]) == 1)
+            {
+                char *name = extractStrings(buffer, extractClientCommand[2], 1)[0];
+                int status = deleteFish(aquarium, *(int *)client_fd, name);
+                if (status == 1)
+                {
+                    length_write = write(*(int *)client_fd, "OK\n", 3);
+                }
+                else
+                {
+                    length_write = write(*(int *)client_fd, "NOK :Poisson inexistant \n", 4);
+                }
+            }
+            else if (verifRegex(buffer, clientCommand[4]) == 1)
+            {
+                char *name = extractStrings(buffer, extractClientCommand[4], 1)[0];
+                char *msg = pong(name);
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+                free(msg);
+            }
+            else if (verifRegex(buffer, clientCommand[3]) == 1)
+            {
+                char *name = extractStrings(buffer, extractClientCommand[3], 1)[0];
+
+                char *msg = startFish(aquarium, *(int *)client_fd, name);
+
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+            }
+            else if (verifRegex(buffer, clientCommand[5]) == 1)
+            {
+                disconnect(aquarium, *(int *)client_fd);
+                length_write = write(*(int *)client_fd, "bye\n", 4);
+                close(*(int *)client_fd);
+                pthread_exit(NULL);
+            }
+            else
+            {
+                length_write = write(*(int *)client_fd, "NOK : commande introuvable\n", strlen("NOK : commande introuvable\n"));
+            }
+
+            if (length == 0)
+            {
+
+                // Client has disconnected, close the socket and exit the thread
+                disconnect(aquarium, *(int *)client_fd);
+                close(*(int *)client_fd);
+                pthread_exit(NULL);
+            }
+        }
+
+        // Reset the file descriptor set and timeout for the next iteration of the loop
+        FD_ZERO(&read_fds);
+        FD_SET(*(int *)client_fd, &read_fds);
+        timeout.tv_sec = 10;
+        timeout.tv_usec = 0;
     }
+
     return NULL;
 }
 
@@ -173,7 +201,7 @@ void ServerAction(void *buffer)
     char *output[10];
     char *str_parse = malloc(100 * sizeof(char));
     // debug
-    //printf("le contenu du buffer est : %s", (char *)buffer);
+    // printf("le contenu du buffer est : %s", (char *)buffer);
     // load aquarium
     if (verifRegex(buffer, serverCommand[0]) == 1)
     {

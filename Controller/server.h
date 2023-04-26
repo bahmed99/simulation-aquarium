@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <sys/select.h>
 #include <signal.h>
-
+#include <errno.h>
 /********* Déclaration des fonctions *********/
 
 /**

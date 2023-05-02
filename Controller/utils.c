@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include "utils.h"
 
+// Liste globale des valeurs valides pour mobilityPattern
+const char* MobilityPatterns[] = {"RandomWayPoint", "HorinzontalPathWay"};
+
 Aquarium *loadAquarium(char *AquariumName)
 {
     logger_init("log_controller.txt");
@@ -223,6 +226,15 @@ void saveAquarium(Aquarium *a, char *aquariumName)
     logger_close();
 }
 
+int isValidMobilityPattern(const char* mobilityPattern) {
+    for (int i = 0; i < sizeof(MobilityPatterns) / sizeof(MobilityPatterns[0]); i++) {
+        if (strcmp(mobilityPattern,MobilityPatterns[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 char *addFish(Aquarium *a, int client, char *name, int x, int y, int width, int height, char *mobilityPattern)
 {
     logger_init("log_controller.txt");
@@ -237,6 +249,12 @@ char *addFish(Aquarium *a, int client, char *name, int x, int y, int width, int 
         newFish.width = width;
         newFish.height = height;
         newFish.mobile = 0;
+        if(!isValidMobilityPattern(mobilityPattern)){
+            message = "NOK : modèle de mobilité non supporté \n";
+            logger_log(WARNING, "modèle de mobilité %s non supporté", mobilityPattern);
+            logger_close();
+            return message; 
+        }
         strcpy(newFish.mobilityPattern, mobilityPattern);
         for (int i = 0; i < a->num_views; i++)
         {

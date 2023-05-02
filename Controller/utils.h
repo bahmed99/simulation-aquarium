@@ -17,10 +17,8 @@
 #include "logger.h"
 
 
+
 /********* Déclaration des structures *********/
-
-// Définition de la structure Fish
-
 
 // Définition de la structure Coordinates
 struct Coordinates
@@ -30,6 +28,7 @@ struct Coordinates
 };
 typedef struct Coordinates Coordinates;
 
+// Définition de la structure Fish
 struct Fish
 {
     char name[50];
@@ -40,6 +39,10 @@ struct Fish
     int mobile;
 };
 typedef struct Fish Fish;
+
+
+
+
 
 
 // Définition de la structure View
@@ -224,5 +227,14 @@ char *pong(char *port);
 */
 
 char *startFish(Aquarium *aquarium, int client, char *fishName);
+
+/**
+ *  @brief validate the mobility pattern
+ * 
+ * @return bool
+ *  
+*/
+int isValidMobilityPattern(const char* mobilityPattern);
+
 
 #endif

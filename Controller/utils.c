@@ -300,7 +300,7 @@ char *addFish(Aquarium *a, int client, char *name, int x, int y, int width, int 
 
 int deleteFish(Aquarium *a, int client, char *fishName)
 {
-    
+
     int i, j, k;
     View *v;
     Fish *f;
@@ -349,7 +349,6 @@ int deleteFish(Aquarium *a, int client, char *fishName)
         }
     }
 
-    
     logger_log(WARNING, "Client %d has no view", client);
     logger_close();
     return 0; // Client non trouvé
@@ -392,7 +391,7 @@ char *authenticate(char *id, Aquarium *aquarium, int socket)
                 return aquarium->views[j].name;
             }
         }
-    
+
         logger_log(WARNING, "No view available for client %d", socket);
         logger_close();
 
@@ -420,7 +419,6 @@ void disconnect(Aquarium *aquarium, int client_socket)
         if (aquarium->views[i].num_fishes != 0)
         {
             aquarium->views[i].num_fishes = 0;
-
 
             free(aquarium->views[i].fishes);
         }
@@ -564,7 +562,7 @@ char *status(Aquarium *aquarium, int client)
 
 {
     logger_init("log_controller.txt");
-    int test=0;
+    int test = 0;
     if (aquarium != NULL)
     {
         char *status = (char *)malloc(5000);
@@ -582,7 +580,7 @@ char *status(Aquarium *aquarium, int client)
                 if (aquarium->views[i].num_fishes == 0)
                 {
                     sprintf(status, "OK : Connecté au contrôleur, 0 poisson trouvé\n");
-                    logger_log(INFO,"OK : Connecté au contrôleur, 0 poisson trouvé\n");
+                    logger_log(INFO, "OK : Connecté au contrôleur, 0 poisson trouvé\n");
                     free(fishes);
                     free(tmp);
 
@@ -591,30 +589,28 @@ char *status(Aquarium *aquarium, int client)
                 }
 
                 sprintf(status, "OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
-                logger_log(INFO,"OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
-
-
+                logger_log(INFO, "OK : Connecté au contrôleur, %d poissons trouvés\n", aquarium->views[i].num_fishes);
 
                 for (j = 0; j < aquarium->views[i].num_fishes; j++)
                 {
                     sprintf(tmp, "  Fish %s at %dx%d,%dx%d %s\n", aquarium->views[i].fishes[j].name, aquarium->views[i].fishes[j].coord.x, aquarium->views[i].fishes[j].coord.y, aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height, aquarium->views[i].fishes[j].mobile == 1 ? "started" : "notStarted");
                     strcat(fishes, tmp);
                 }
-                test=1;
+                test = 1;
                 break;
             }
         }
 
-        if(test==0)
+        if (test == 0)
         {
             sprintf(status, "NOK : Vous n'êtes pas connecté au contrôleur\n");
-            logger_log(ERROR,"ERROR : Vous n'êtes pas connecté au contrôleur\n");
+            logger_log(ERROR, "ERROR : Vous n'êtes pas connecté au contrôleur\n");
             free(fishes);
             free(tmp);
             logger_close();
             return status;
         }
-        
+
         strcat(status, fishes);
         logger_close();
 
@@ -622,22 +618,21 @@ char *status(Aquarium *aquarium, int client)
         free(tmp);
         return status;
     }
-
 }
 
 char *pong(char *port)
 {
-    
+
     char *pong = (char *)malloc(1000);
     sprintf(pong, "pong %s\n", port);
     return pong;
 }
 
-
-char *startFish(Aquarium *aquarium, int client, char *fishName){
+char *startFish(Aquarium *aquarium, int client, char *fishName)
+{
 
     logger_init("log_controller.txt");
-    int test=0;
+    int test = 0;
     if (aquarium != NULL)
     {
         char *startFish = (char *)malloc(1000);
@@ -654,7 +649,7 @@ char *startFish(Aquarium *aquarium, int client, char *fishName){
                         if (aquarium->views[i].fishes[j].mobile == 1)
                         {
                             sprintf(startFish, "NOK : Le poisson %s est déjà en mouvement\n", fishName);
-                            logger_log(ERROR,"NOK : Le poisson %s est déjà en mouvement\n", fishName);
+                            logger_log(ERROR, "NOK : Le poisson %s est déjà en mouvement\n", fishName);
                             logger_close();
                             return startFish;
                         }
@@ -662,24 +657,88 @@ char *startFish(Aquarium *aquarium, int client, char *fishName){
                         {
                             aquarium->views[i].fishes[j].mobile = 1;
                             sprintf(startFish, "OK : Le poisson %s est en mouvement\n", fishName);
-                            logger_log(INFO,"OK : Le poisson %s est en mouvement\n", fishName);
+                            logger_log(INFO, "OK : Le poisson %s est en mouvement\n", fishName);
                             logger_close();
                             return startFish;
                         }
                     }
                 }
                 sprintf(startFish, "NOK : Le poisson %s n'a pas été trouvé\n", fishName);
-                logger_log(ERROR,"NOK : Le poisson %s n'a pas été trouvé\n", fishName);
+                logger_log(ERROR, "NOK : Le poisson %s n'a pas été trouvé\n", fishName);
                 logger_close();
                 return startFish;
             }
         }
-        if(test==0)
+        if (test == 0)
         {
             sprintf(startFish, "NOK : Vous n'êtes pas connecté au serveur\n");
-            logger_log(ERROR,"NOK : Vous n'êtes pas connecté au serveur\n");
+            logger_log(ERROR, "NOK : Vous n'êtes pas connecté au serveur\n");
             logger_close();
             return startFish;
         }
     }
+}
+
+int *RandomWayPoint(Aquarium *aquarium)
+{
+    int *coord = (int *)malloc(2 * sizeof(int));
+    int i;
+    int j;
+
+    int x = rand() % aquarium->dimensions[0];
+    int y = rand() % aquarium->dimensions[1];
+
+    coord[0] = x;
+    coord[1] = y;
+
+    return coord;
+}
+
+char *ls(Aquarium *aquarium, int client)
+{
+    char *ls_msg = (char *)malloc(1000);
+    if (aquarium != NULL)
+    {
+        int i;
+
+        int test = 0;
+        for (i = 0; i < aquarium->num_views; i++)
+        {
+            if (aquarium->views[i].socket == client)
+            {
+                test = 1;
+                char *tmp = (char *)malloc(1000);
+                int j;
+
+                int k;
+                strcpy(ls_msg, "");
+                for (k = 0; k < 3; k++)
+                {
+                    strcat(ls_msg, "List ");
+                    for (j = 0; j < aquarium->views[i].num_fishes; j++)
+                    {
+                        if (aquarium->views[i].fishes[j].mobile == 1)
+                        {
+                            int *corr = applyPathWay(aquarium,aquarium->views[i].fishes[j].mobilityPattern);
+                            sprintf(tmp, "[%s at %dx%d,%dx%d, 5] ", aquarium->views[i].fishes[j].name, corr[0], corr[1], aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height);
+                            strcat(ls_msg, tmp);
+                            free(corr);
+                        }
+                    }
+                    strcat(ls_msg, "\n");
+                }
+                free(tmp);
+            }
+        }
+        if (test == 0)
+        {
+            sprintf(ls_msg, "NOK : Vous n'avez pas de vue associé\n");
+            return ls_msg;
+        }
+
+        return ls_msg;
+    }
+    sprintf(ls_msg, "NOK : l'aquarium n'est pas initilialisé\n");
+
+    return ls_msg;
 }

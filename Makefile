@@ -20,6 +20,7 @@ view:
 	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d $(BUILD_DIR) View/Client.java 
 	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp $(BUILD_DIR) Client
 
+
 interface:
 	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java
 	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium

@@ -15,7 +15,8 @@
 #include <regex.h>
 #include <sys/mman.h>
 #include "logger.h"
-
+#include <time.h>
+#include <stdlib.h>
 
 
 /********* Déclaration des structures *********/
@@ -213,6 +214,8 @@ char *status(Aquarium *aquarium, int client);
 /** 
  * @brief return response of ping
  * 
+ * @param port
+ * 
  * @return char*
 */
 
@@ -222,11 +225,16 @@ char *pong(char *port);
 /**
  * @brief return response of startFish
  * 
+ * @param aquarium
+ * @param client
+ * @param fishName
+ * 
  * @return char*
  *
 */
 
 char *startFish(Aquarium *aquarium, int client, char *fishName);
+
 
 /**
  *  @brief validate the mobility pattern
@@ -236,5 +244,27 @@ char *startFish(Aquarium *aquarium, int client, char *fishName);
 */
 int isValidMobilityPattern(const char* mobilityPattern);
 
+
+
+/**
+ * @brief return position of fish
+ * 
+ * @param aquarium
+ * @param client
+ * 
+ * @return char* 
+ *  
+*/
+char* ls(Aquarium *aquarium, int client);
+
+/**
+ * @brief return random positions
+ * 
+ * @param aquarium
+ * 
+ * @return int*
+ * 
+*/
+int* RandomWayPoint(Aquarium *aquarium) ;
 
 #endif

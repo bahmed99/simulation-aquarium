@@ -3,3 +3,5 @@
 Build/*
 Controller/test.c 
 aquarium.txt
+affichage.cfg
+controller.cfg

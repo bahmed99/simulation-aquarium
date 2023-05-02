@@ -679,7 +679,7 @@ char *startFish(Aquarium *aquarium, int client, char *fishName)
     }
 }
 
-int *RandomWayPoint(Aquarium *aquarium)
+int *RandomPathWay(Aquarium *aquarium)
 {
     int *coord = (int *)malloc(2 * sizeof(int));
     int i;
@@ -692,6 +692,23 @@ int *RandomWayPoint(Aquarium *aquarium)
     coord[1] = y;
 
     return coord;
+}
+// Fonction qui recherche une entrée dans la table de hachage des fonctions de PathWay
+// PathWayFunction findPathWayFunction(char* name) {
+//     for (int i = 0; i < PATH_WAY_TABLE_SIZE; i++) {
+//         if (strcmp(name, pathWayTable[i].name) == 0) {
+//             return pathWayTable[i].function;
+//         }
+//     }
+//     return NULL;
+// }
+
+int* applyPathWay(Aquarium* aquarium, char* pathWay){
+    // PathWayFunction function = findPathWayFunction(pathWay);
+    if (strcmp(pathWay,"RandomPathWay")) {
+        return RandomPathWay(aquarium);
+    }   
+    
 }
 
 char *ls(Aquarium *aquarium, int client)

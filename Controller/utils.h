@@ -18,7 +18,6 @@
 #include <time.h>
 #include <stdlib.h>
 
-
 /********* Déclaration des structures *********/
 
 // Définition de la structure Coordinates
@@ -265,6 +264,40 @@ char* ls(Aquarium *aquarium, int client);
  * @return int*
  * 
 */
-int* RandomWayPoint(Aquarium *aquarium) ;
+int* RandomPathWay(Aquarium *aquarium) ;
+/**
+ * @brief apply a given pathWay function
+ * 
+ * @return int*
+*/
+
+
+// // Définition d'un type de données pour l'utiliser dans les fonctions de pathWay
+// typedef int* (*PathWayFunction) (aquarium*);
+
+// typedef struct {
+//     char* name;
+//     PathWayFunction function;
+// } PathWayEntry;
+
+// // Table de hachage des fonctions de PathWay
+// PathWayEntry pathWayTable[] = {
+//     {"RandomPathWay", &RandomPathWay},
+//     //{"HorizontalPathWay", &applyHorizontalPathWay},
+// };
+// const int PATH_WAY_TABLE_SIZE = sizeof(PathWayTable) / sizeof(PathWayEntry);
+
+
+
+int* applyPathWay(Aquarium* aquarium, char* pathWay);
+/**
+ * 
+ * @brief search for a pathWay function by its name
+ * 
+ * @return PathWayFunction
+ * 
+*/
+// PathWayFunction findPathWayFunction(char* name);
+
 
 #endif

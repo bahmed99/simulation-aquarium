@@ -1,0 +1,21 @@
+[INFO] 2023-05-02 16:31:16 Aquarium aquarium loaded (4 display view) !
+[INFO] 2023-05-02 17:18:33 Aquarium aquarium loaded (4 display view) !
+[INFO] �ÏV2023-05-02 17:18:56 Client 4 connected to view N1
+[INFO] �ÏV2023-05-02 17:19:06 Client 4 disconnected from view N1
+[INFO] �ÏV2023-05-02 17:19:38 Client 4 connected to view N1
+[INFO] �ÏV2023-05-02 17:19:49 Client 4 disconnected from view N1
+[INFO] �ÏV2023-05-02 17:20:17 Client 4 connected to view N1
+[INFO] 2023-05-02 17:20:19 OK : Connecté au contrôleur, 0 poisson trouvé
+
+[INFO] �Ï	2023-05-02 17:20:23 Fish PoissonNain added to view N1
+[INFO] 2023-05-02 17:20:25 OK : Connecté au contrôleur, 1 poissons trouvés
+
+[WARNING] �ÏV2023-05-02 17:20:32 modèle de mobilité RandomWayPoi non supporté
+[WARNING] �ÏV2023-05-02 17:20:38 modèle de mobilité RandomWayP non supporté
+[INFO] �ÏV2023-05-02 17:20:48 Client 4 disconnected from view N1
+[INFO] 2023-05-02 17:26:31 Aquarium aquarium loaded (4 display view) !
+[INFO] �"V2023-05-02 17:26:41 Client 4 connected to view N1
+[INFO] 2023-05-02 17:26:44 OK : Connecté au contrôleur, 0 poisson trouvé
+
+[INFO] �	2023-05-02 17:27:47 Fish PoissonNain added to view N1
+[WARNING] �"V2023-05-02 17:27:53 modèle de mobilité RandomWayPoids non supporté

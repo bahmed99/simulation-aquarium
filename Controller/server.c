@@ -1,6 +1,8 @@
 #include "server.h"
 #include "utils.h"
 
+
+
 Aquarium *aquarium = NULL;
 // regular expressions to handle server commands
 char *serverCommand[] = {
@@ -69,7 +71,7 @@ void *ClientHandler(void *client_fd)
 
     // Set a timeout of 60 seconds
     struct timeval timeout;
-    timeout.tv_sec = 60;
+    timeout.tv_sec = 6000000;
     timeout.tv_usec = 0;
     while (1)
     {
@@ -188,7 +190,7 @@ void *ClientHandler(void *client_fd)
         // Reset the file descriptor set and timeout for the next iteration of the loop
         FD_ZERO(&read_fds);
         FD_SET(*(int *)client_fd, &read_fds);
-        timeout.tv_sec = 10;
+        timeout.tv_sec = 6000000;
         timeout.tv_usec = 0;
     }
 

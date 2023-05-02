@@ -1,5 +1,5 @@
 CC=gcc
-PATH_TO_FX=/home/bully/Desktop/javafx-sdk-20/lib
+PATH_TO_FX=/home/ilyes/Bureau/javafx-sdk-20.0.1/lib
 BUILD_DIR=Build
 CFALGS=-Wall 
 
@@ -17,8 +17,8 @@ server: utils logger_controller
 	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
-	javac -d $(BUILD_DIR) View/Client.java 
-	java -cp $(BUILD_DIR) Client
+	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d $(BUILD_DIR) View/Client.java 
+	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp $(BUILD_DIR) Client
 
 interface:
 	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java

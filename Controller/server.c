@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
     srand(time(NULL));
     char port[5];
     sprintf(port, "%d", ExtractPort());
-    int display_timeout_value = ExtractTimeout();
+    display_timeout_value = ExtractTimeout();
     int ServSock;
     fd_set SocketSet;
     int maxDescriptor = SocketsCreator(&ServSock, port);

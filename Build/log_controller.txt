@@ -74,3 +74,18 @@
 [INFO] h«¶2023-05-05 08:23:00 Client 4 connected to view N1
 [INFO] h«¶2023-05-05 08:26:33 Client 4 connected to view N2
 [INFO] h«¶2023-05-05 08:26:33 Client 4 disconnected from view N1
+[INFO] 2023-05-05 09:19:31 Aquarium aquarium loaded (4 display view) !
+[INFO] 2023-05-05 09:21:33 Aquarium aquarium loaded (4 display view) !
+[INFO] 2023-05-05 09:22:18 Aquarium aquarium loaded (4 display view) !
+[INFO] 2023-05-05 09:23:40 Aquarium aquarium loaded (4 display view) !
+[INFO] 2023-05-05 09:24:20 Aquarium aquarium loaded (4 display view) !
+[INFO]  cdU2023-05-05 09:24:25 Client 4 connected to view N1
+[INFO]  cdU2023-05-05 09:25:14 Client 4 connected to view N2
+[INFO]  cdU2023-05-05 09:25:14 Client 4 disconnected from view N1
+[INFO]  cdU2023-05-05 09:25:41 Client 4 connected to view N1
+[INFO]  cdU2023-05-05 09:25:51 Fish PoissonNain added to view N1
+[INFO]  cdU2023-05-05 09:26:27 Client 4 disconnected from view N1
+[INFO] 2023-05-05 09:26:58 Aquarium aquarium loaded (4 display view) !
+[INFO]  +ÈÅGV2023-05-05 09:27:02 Client 4 connected to view N1
+[INFO]  +ÈÅGV2023-05-05 09:27:06 Client 4 connected to view N2
+[INFO]  +ÈÅGV2023-05-05 09:27:06 Client 4 disconnected from view N1

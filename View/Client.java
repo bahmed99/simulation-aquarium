@@ -23,7 +23,7 @@ import javafx.geometry.Point2D;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Client extends Application{
+public class Client extends Application {
     private static String CONFIG_FILE_PATH = "./affichage.cfg";
     private Socket clientSocket;
     private PrintWriter out;
@@ -220,7 +220,7 @@ public class Client extends Application{
             Platform.runLater(() -> {fishGroup.getChildren().add(fishImageView);});
         }
 
-
+    }
     public void close() {
         try {
             out.close();
@@ -240,4 +240,5 @@ public class Client extends Application{
     }
 
 
-}
+    }
+

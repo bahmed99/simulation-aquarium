@@ -1,0 +1,5 @@
+[INFO] 2023-05-02 18:04:42 Aquarium aquarium loaded (4 display view) !
+[INFO] h„ùU2023-05-02 18:04:55 Client 4 connected to view N1
+[INFO] h„	2023-05-02 18:05:11 Fish PoissonNain added to view N1
+[INFO] 2023-05-02 18:05:27 OK : Le poisson PoissonNain est en mouvement
+

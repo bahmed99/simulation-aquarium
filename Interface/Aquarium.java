@@ -85,7 +85,7 @@ public class Aquarium extends Application {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); AquariumRunnabl
                 }
             }
         }

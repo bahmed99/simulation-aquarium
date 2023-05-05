@@ -30,7 +30,9 @@ public class Client extends Application{
     private BufferedReader in;
     private Group fishGroup;
     private ImageView backgroundImageView;
-
+    private String id ;
+    private String controller_port;
+    private String display_timeout_value;
 
     public static void main(String[] args) {
             launch(args);
@@ -42,14 +44,20 @@ public class Client extends Application{
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE_PATH)) {
             props.load(fis);
 
-            String controller_port = props.getProperty("controller-port");
+            controller_port = props.getProperty("controller-port");
             String server = props.getProperty("controller-address");
+            id = props.getProperty("id");
+            display_timeout_value = props.getProperty("display-timeout-value");
             
             int port = Integer.parseInt(controller_port);
 
             clientSocket = new Socket(server, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            if(id != null)
+                out.println("hello in as " + id);
+            else 
+                out.println("hello");
 
         } catch (Exception e) {
             System.err.println("Error loading config file: " + e.getMessage());
@@ -78,6 +86,24 @@ public class Client extends Application{
         Thread receiverThread = new Thread(new ReceiverRunnable());
         receiverThread.setDaemon(true);
         receiverThread.start();
+
+        Thread pingThread = new Thread(new PingRunnable());
+        pingThread.setDaemon(true);
+        pingThread.start();
+    }
+
+    private class PingRunnable implements Runnable{
+        @Override
+        public void run() {
+            while(true){
+                try {
+                    Thread.sleep(Integer.parseInt(display_timeout_value));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                    out.println("ping "+controller_port);
+            }
+        }
     }
 
     private class AquariumRunnable implements Runnable {
@@ -158,7 +184,6 @@ public class Client extends Application{
         }
     }
 
-
     public void RandomWayPoint(double gotoX, double gotoY) {
         gotoX = Math.random()*500; 
         gotoY = Math.random()*400;
@@ -194,7 +219,7 @@ public class Client extends Application{
             fishImageView.setY(startY);
             Platform.runLater(() -> {fishGroup.getChildren().add(fishImageView);});
         }
-    }
+
 
     public void close() {
         try {

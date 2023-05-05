@@ -1,6 +1,8 @@
 #include "server.h"
 #include "utils.h"
 
+
+
 Aquarium *aquarium = NULL;
 // regular expressions to handle server commands
 char *serverCommand[] = {
@@ -25,7 +27,8 @@ char *clientCommand[] = {
     "^startFish [a-zA-Z0-9]+$",
     "^ping [0-9]{1,5}$",
     "log out",
-    "getFishes",
+    "ls",
+    "getFishes"
 
 };
 
@@ -70,24 +73,24 @@ void *ClientHandler(void *client_fd)
 
     // Set a timeout of 60 seconds
     struct timeval timeout;
-    timeout.tv_sec = 600000;
+    timeout.tv_sec = 60;
     timeout.tv_usec = 0;
     while (1)
     {
-        // int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
-        // if (result == -1)
-        // {
-        //     printf("ERROR in select(): %s\n", strerror(errno));
-        //     exit(1);
-        // }
-        // else if (result == 0)
-        // {
-        //     write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
-        //     disconnect(aquarium, *(int *)client_fd);
-        //     close(*(int *)client_fd);
-        //     pthread_exit(NULL);
-        // }
-        if (FD_ISSET(*(int *)client_fd, &read_fds))
+        int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
+        if (result == -1)
+        {
+            printf("ERROR in select(): %s\n", strerror(errno));
+            exit(1);
+        }
+        else if (result == 0)
+        {
+            write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
+            disconnect(aquarium, *(int *)client_fd);
+            close(*(int *)client_fd);
+            pthread_exit(NULL);
+        }
+        else if (FD_ISSET(*(int *)client_fd, &read_fds))
         {
             int length = read(*(int *)client_fd, buffer, 255);
             if (length < 0)
@@ -164,6 +167,12 @@ void *ClientHandler(void *client_fd)
 
                 length_write = write(*(int *)client_fd, msg, strlen(msg));
             }
+            else if(verifRegex(buffer,clientCommand[6])==1){
+                
+                char *msg = ls(aquarium, *(int *)client_fd);
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+                free(msg);
+            }
             else if (verifRegex(buffer, clientCommand[5]) == 1)
             {
                 disconnect(aquarium, *(int *)client_fd);
@@ -171,7 +180,7 @@ void *ClientHandler(void *client_fd)
                 close(*(int *)client_fd);
                 pthread_exit(NULL);
             }
-            else if (verifRegex(buffer, clientCommand[6]) == 1)
+            else if (verifRegex(buffer, clientCommand[7]) == 1)
             {
                 char *msg = getFishes(aquarium, *(int *)client_fd);
 
@@ -196,7 +205,7 @@ void *ClientHandler(void *client_fd)
         // Reset the file descriptor set and timeout for the next iteration of the loop
         FD_ZERO(&read_fds);
         FD_SET(*(int *)client_fd, &read_fds);
-        timeout.tv_sec = 10;
+        timeout.tv_sec = 6000000;
         timeout.tv_usec = 0;
     }
 
@@ -399,6 +408,7 @@ int ExtractPort()
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     char port[5];
     sprintf(port, "%d", ExtractPort());
     int ServSock;

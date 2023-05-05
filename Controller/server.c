@@ -25,6 +25,7 @@ char *clientCommand[] = {
     "^startFish [a-zA-Z0-9]+$",
     "^ping [0-9]{1,5}$",
     "log out",
+    "getFishes",
 
 };
 
@@ -69,24 +70,24 @@ void *ClientHandler(void *client_fd)
 
     // Set a timeout of 60 seconds
     struct timeval timeout;
-    timeout.tv_sec = 60;
+    timeout.tv_sec = 600000;
     timeout.tv_usec = 0;
     while (1)
     {
-        int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
-        if (result == -1)
-        {
-            printf("ERROR in select(): %s\n", strerror(errno));
-            exit(1);
-        }
-        else if (result == 0)
-        {
-            write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
-            disconnect(aquarium, *(int *)client_fd);
-            close(*(int *)client_fd);
-            pthread_exit(NULL);
-        }
-        else if (FD_ISSET(*(int *)client_fd, &read_fds))
+        // int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
+        // if (result == -1)
+        // {
+        //     printf("ERROR in select(): %s\n", strerror(errno));
+        //     exit(1);
+        // }
+        // else if (result == 0)
+        // {
+        //     write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
+        //     disconnect(aquarium, *(int *)client_fd);
+        //     close(*(int *)client_fd);
+        //     pthread_exit(NULL);
+        // }
+        if (FD_ISSET(*(int *)client_fd, &read_fds))
         {
             int length = read(*(int *)client_fd, buffer, 255);
             if (length < 0)
@@ -169,6 +170,13 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, "bye\n", 4);
                 close(*(int *)client_fd);
                 pthread_exit(NULL);
+            }
+            else if (verifRegex(buffer, clientCommand[6]) == 1)
+            {
+                char *msg = getFishes(aquarium, *(int *)client_fd);
+
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+
             }
             else
             {

@@ -679,7 +679,7 @@ char *startFish(Aquarium *aquarium, int client, char *fishName)
     }
 }
 
-int *RandomPathWay(Aquarium *aquarium)
+int *RandomWayPoint(Aquarium *aquarium)
 {
     int *coord = (int *)malloc(2 * sizeof(int));
     int i;
@@ -705,8 +705,8 @@ int *RandomPathWay(Aquarium *aquarium)
 
 int* applyPathWay(Aquarium* aquarium, char* pathWay){
     // PathWayFunction function = findPathWayFunction(pathWay);
-    if (strcmp(pathWay,"RandomPathWay")) {
-        return RandomPathWay(aquarium);
+    if (strcmp(pathWay,"RandomWayPoint")) {
+        return RandomWayPoint(aquarium);
     }   
     
 }

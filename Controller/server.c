@@ -29,7 +29,8 @@ char *clientCommand[] = {
     "^startFish [a-zA-Z0-9]+$",
     "^ping [0-9]{1,5}$",
     "log out",
-    "ls"
+    "ls",
+    "getFishes"
 
 };
 
@@ -86,7 +87,7 @@ void *ClientHandler(void *client_fd)
         }
         else if (result == 0)
         {
-            write(*(int *)client_fd, "\nNOK : timeout\n", strlen("\nNOK : timeout\n"));
+            write(*(int *)client_fd, "NOK : timeout\n", strlen("NOK : timeout\n"));
             disconnect(aquarium, *(int *)client_fd);
             close(*(int *)client_fd);
             pthread_exit(NULL);
@@ -180,6 +181,13 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, "bye\n", 4);
                 close(*(int *)client_fd);
                 pthread_exit(NULL);
+            }
+            else if (verifRegex(buffer, clientCommand[7]) == 1)
+            {
+                char *msg = getFishes(aquarium, *(int *)client_fd);
+
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+
             }
             else
             {

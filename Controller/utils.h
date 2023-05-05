@@ -234,6 +234,14 @@ char *pong(char *port);
 
 char *startFish(Aquarium *aquarium, int client, char *fishName);
 
+/**
+ * @brief return response of getFishes
+ * 
+ * @return char*
+ *
+*/
+char *getFishes(Aquarium *aquarium, int client);
+
 
 /**
  *  @brief validate the mobility pattern

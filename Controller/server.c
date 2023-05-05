@@ -4,6 +4,8 @@
 
 
 Aquarium *aquarium = NULL;
+
+int display_timeout_value=0;
 // regular expressions to handle server commands
 char *serverCommand[] = {
     "^load [a-zA-Z0-9]+$",
@@ -74,7 +76,7 @@ void *ClientHandler(void *client_fd)
 
     // Set a timeout of 60 seconds
     struct timeval timeout;
-    timeout.tv_sec = 60;
+    timeout.tv_sec = display_timeout_value;
     timeout.tv_usec = 0;
     while (1)
     {
@@ -213,7 +215,7 @@ void *ClientHandler(void *client_fd)
         // Reset the file descriptor set and timeout for the next iteration of the loop
         FD_ZERO(&read_fds);
         FD_SET(*(int *)client_fd, &read_fds);
-        timeout.tv_sec = 6000000;
+        timeout.tv_sec = display_timeout_value;
         timeout.tv_usec = 0;
     }
 
@@ -414,11 +416,37 @@ int ExtractPort()
     return port;
 }
 
+
+int ExtractTimeout()
+{
+    FILE *config_file;
+    char buffer[1024];
+    int timeout;
+    config_file = fopen("controller.cfg", "r");
+    if (config_file == NULL)
+    {
+        perror("Error opening config file");
+        exit(1);
+    }
+
+    while (fgets(buffer, sizeof(buffer), config_file) != NULL)
+    {
+        if (strstr(buffer, "display-timeout-value =") != NULL)
+        {
+            timeout = atoi(strstr(buffer, "=") + 1);
+            break;
+        }
+    }
+    fclose(config_file);
+    return timeout;
+}
+
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
     char port[5];
     sprintf(port, "%d", ExtractPort());
+    display_timeout_value = ExtractTimeout();
     int ServSock;
     fd_set SocketSet;
     int maxDescriptor = SocketsCreator(&ServSock, port);

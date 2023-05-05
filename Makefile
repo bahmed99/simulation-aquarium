@@ -1,5 +1,5 @@
 CC=gcc
-PATH_TO_FX=/home/ilyes/Bureau/javafx-sdk-20.0.1/lib
+PATH_TO_FX=/home/ahmed/Bureau/javafx-sdk-20.0.1/lib
 BUILD_DIR=Build
 CFALGS=-Wall 
 
@@ -17,8 +17,8 @@ server: utils logger_controller
 	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
-	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d $(BUILD_DIR) View/Client.java 
-	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp $(BUILD_DIR) Client
+	javac --module-path /usr/share/openjfx/lib --add-modules javafx.controls -d $(BUILD_DIR) View/Client.java 
+	java  --module-path /usr/share/openjfx/lib --add-modules javafx.controls -cp $(BUILD_DIR) Client
 
 
 interface:
@@ -30,4 +30,4 @@ logger_controller:
 	$(CC) $(CFLAGS) -c Controller/logger.c -o $(BUILD_DIR)/logger_controller.o
 
 clean:
-	find Build/ ! \( -name '*.txt' -o -name '*.cfg' \) -type f -delete
+	find Build/ ! \( -name '*.txt' -o -name '*.cfg' -o -name '*.png' -o -name '*.jpg' \) -type f -delete

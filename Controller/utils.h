@@ -272,7 +272,7 @@ char* ls(Aquarium *aquarium, int client);
  * @return int*
  * 
 */
-int* RandomPathWay(Aquarium *aquarium) ;
+int* RandomWayPoint(Aquarium *aquarium) ;
 /**
  * @brief apply a given pathWay function
  * 

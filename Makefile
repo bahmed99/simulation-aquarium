@@ -1,5 +1,5 @@
 CC=gcc
-PATH_TO_FX=/home/ilyes/Bureau/javafx-sdk-20.0.1/lib
+PATH_TO_FX=/home/ahmed/Bureau/javafx-sdk-20.0.1/lib
 BUILD_DIR=Build
 CFALGS=-Wall 
 

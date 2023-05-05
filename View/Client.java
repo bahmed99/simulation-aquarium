@@ -20,6 +20,8 @@ import javafx.scene.Node;
 import java.util.Map;
 import java.util.HashMap;
 import javafx.geometry.Point2D;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Client extends Application{
     private static String CONFIG_FILE_PATH = "./affichage.cfg";
@@ -68,7 +70,7 @@ public class Client extends Application{
         String userInput;
         Group root = new Group(backgroundImageView, fishGroup);
             
-        Scene scene = new Scene(root, 600, 420);
+        Scene scene = new Scene(root, 1000, 1000);
         stage.setScene(scene);
         stage.show();
 
@@ -119,16 +121,17 @@ public class Client extends Application{
                 }
                 for (Node node : fishGroup.getChildren()) {
                     ImageView fishImageView = (ImageView) node;
-                    TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(2.5), fishImageView);
+                    TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(5), fishImageView);
                     //fishTransition.setCycleCount(Animation.INDEFINITE);
                     Point2D debut_fishPosition = fishPositions.get(fishImageView);
                     fishTransition.setFromX(debut_fishPosition.getX());
                     fishTransition.setFromY(debut_fishPosition.getY());
-                    double gotoX = Math.random()*500; // Random movements
-                    double gotoY = Math.random()*400;
+                    double gotoX = 0;
+                    double gotoY = 0;
+                    RandomWayPoint(gotoX, gotoY);
                     fishTransition.setToX(gotoX);
                     fishTransition.setToY(gotoY);
-                    if (gotoX < debut_fishPosition.getX()) { // Flipping image
+                    if (gotoX < debut_fishPosition.getX()) {
                         fishImageView.setScaleX(-1);
                     } else {
                         fishImageView.setScaleX(1);
@@ -172,6 +175,7 @@ public class Client extends Application{
                 String userInput;
                 System.out.print("$ ");
                 while ((userInput = stdIn.readLine()) != null) {
+                    ExtractFish(userInput);
                     out.println(userInput);
                 }
             } catch (IOException e) {
@@ -180,23 +184,60 @@ public class Client extends Application{
         }
     }
 
+    public void RandomWayPoint(double gotoX, double gotoY) {
+        gotoX = Math.random()*500; 
+        gotoY = Math.random()*400;
+    }
+    public void ExtractFish(String userInput) {
+        Pattern pattern = Pattern.compile("addFish\\s+(\\w+)\\s+at\\s+(\\d+x\\d+),\\s*(\\d+x\\d+)(?:,\\s*(\\w+))?");
+        Matcher matcher = pattern.matcher(userInput);
+        if (matcher.find()) {
+            String fishName = matcher.group(1);
+            String StartingPosition = matcher.group(2);
+            String FinalPosition = matcher.group(2);
+            String movement = matcher.group(4);
+            Pattern coordinatePattern = Pattern.compile("(\\d+)x(\\d+)");
+
+            Matcher startCoordinateMatcher = coordinatePattern.matcher(StartingPosition);
+            int startX = 0;
+            int startY = 0;
+            if (startCoordinateMatcher.find()) {
+                startX = Integer.parseInt(startCoordinateMatcher.group(1));
+                startY = Integer.parseInt(startCoordinateMatcher.group(2));
+            }
+            Matcher finalCoordinateMatcher = coordinatePattern.matcher(FinalPosition);
+            int finalX = 0;
+            int finalY = 0;
+            if (finalCoordinateMatcher.find()) {
+                finalX = Integer.parseInt(finalCoordinateMatcher.group(1));
+                finalY = Integer.parseInt(finalCoordinateMatcher.group(2));
+            }
+            String FishPath = "Images/Fish/"+fishName+".png";
+            Image fishImage = new Image(FishPath, 100, 100, false, false);
+            ImageView fishImageView = new ImageView(fishImage);
+            fishImageView.setX(startX);
+            fishImageView.setY(startY);
+            Platform.runLater(() -> {fishGroup.getChildren().add(fishImageView);});
+        }
+
+
     public void close() {
         try {
             out.close();
         } catch (Exception e) {
         System.err.println("Error closing output stream: " + e.getMessage());
         }
-    try {
-        in.close();
-    } catch (Exception e) {
-        System.err.println("Error closing input stream: " + e.getMessage());
+        try {
+            in.close();
+        } catch (Exception e) {
+            System.err.println("Error closing input stream: " + e.getMessage());
+        }
+        try {
+            clientSocket.close();
+        } catch (Exception e) {
+            System.err.println("Error closing socket: " + e.getMessage());
+        }
     }
-    try {
-        clientSocket.close();
-    } catch (Exception e) {
-        System.err.println("Error closing socket: " + e.getMessage());
-    }
-}
 
 
 }

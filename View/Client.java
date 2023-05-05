@@ -219,7 +219,7 @@ public class Client extends Application{
             fishImageView.setY(startY);
             Platform.runLater(() -> {fishGroup.getChildren().add(fishImageView);});
         }
-
+    }
 
     public void close() {
         try {

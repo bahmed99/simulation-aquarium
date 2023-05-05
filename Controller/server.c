@@ -29,6 +29,7 @@ char *clientCommand[] = {
     "log out",
     "ls",
     "getFishes"
+    "getFishesContinuously"
 
 };
 
@@ -186,6 +187,13 @@ void *ClientHandler(void *client_fd)
 
                 length_write = write(*(int *)client_fd, msg, strlen(msg));
 
+            }
+            else if (verifRegex(buffer, clientCommand[8]) == 1)
+            {
+                char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
+
+                length_write = write(*(int *)client_fd, msg, strlen(msg));
+                
             }
             else
             {

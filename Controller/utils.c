@@ -692,12 +692,38 @@ char *getFishes(Aquarium *aquarium, int client) {
         for (int j = 0; j < aquarium->views[i].num_fishes; j++) {
             Fish fish = aquarium->views[i].fishes[j];
             if (fish.coord.x < ViewWidth && fish.coord.y < ViewHeight) {
-                sprintf(FishList, "%s [%s at %dx%d, %dx%d, %d] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
+                sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
             }
         }
     }
     return FishList;
 }
+
+
+char *getFishesContinuously(Aquarium *aquarium, int client) {
+    char *FishList = (char *)malloc(1000);
+    int * destination;
+    int ViewWidth = 0;
+    int ViewHeight = 0;
+    strcpy(FishList, "list ");
+    for (int i = 0; i < aquarium->num_views; i++) {
+        if (aquarium->views[i].socket == client) {
+            ViewHeight = aquarium->views[i].height;
+            ViewWidth = aquarium->views[i].width;
+        }
+        for (int j = 0; j < aquarium->views[i].num_fishes; j++) {
+            destination = RandomPathWay(aquarium);
+            aquarium->views[i].fishes[j].coord.x = 0;
+            aquarium->views[i].fishes[j].coord.y = 0;
+            Fish fish = aquarium->views[i].fishes[j];
+            if (fish.coord.x < ViewWidth && fish.coord.y < ViewHeight) {
+                sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
+            }
+        }
+    }
+    return FishList;
+}
+
 int *RandomPathWay(Aquarium *aquarium)
 {
     int *coord = (int *)malloc(2 * sizeof(int));

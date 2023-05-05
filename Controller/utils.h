@@ -307,5 +307,7 @@ int* applyPathWay(Aquarium* aquarium, char* pathWay);
 */
 // PathWayFunction findPathWayFunction(char* name);
 
+char *getFishesContinuously(Aquarium *aquarium, int client);
+
 
 #endif

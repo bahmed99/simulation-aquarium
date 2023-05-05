@@ -87,3 +87,4 @@
 [INFO] h���&V2023-05-05 08:39:34 Fish poisson1 added to view N1
 [WARNING] h���&V2023-05-05 08:39:44 Fish poisson1 already exists
 [INFO] h���&V2023-05-05 08:39:44 Client 4 disconnected from view N1
+[INFO] 2023-05-05 09:27:17 Aquarium aquarium loaded (4 display view) !

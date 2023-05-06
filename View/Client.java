@@ -5,6 +5,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Properties;
+import java.util.Scanner;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.layout.Pane;
 import javafx.animation.Animation;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -15,13 +24,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import java.util.Scanner;
+import javafx.util.Pair;
 import javafx.scene.Node;
-import java.util.Map;
-import java.util.HashMap;
 import javafx.geometry.Point2D;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+
 
 public class Client extends Application {
     private static String CONFIG_FILE_PATH = "./affichage.cfg";
@@ -30,6 +37,7 @@ public class Client extends Application {
     private BufferedReader in;
     private Group fishGroup;
     private ImageView backgroundImageView;
+    private Group extractedImageViews;
     private String id ;
     private String controller_port;
     private String display_timeout_value;
@@ -66,9 +74,10 @@ public class Client extends Application {
         Image backgroundImage = new Image("Images/aquarium.jpg");
         backgroundImageView = new ImageView(backgroundImage);
         fishGroup = new Group();
+        extractedImageViews = new Group();
         Scanner scanner = new Scanner(System.in);
         String userInput;
-        Group root = new Group(backgroundImageView, fishGroup);
+        Group root = new Group(backgroundImageView, extractedImageViews);
             
         Scene scene = new Scene(root, 1000, 1000);
         stage.setScene(scene);
@@ -113,32 +122,40 @@ public class Client extends Application {
         
             while (true) {
                 for (Node node : fishGroup.getChildren()) {
-                ImageView fishImageView = (ImageView) node;
+                Pane container = (Pane) node;
+                List<Object> fish = (List<Object>) container.getUserData();
+                ImageView fishImageView = (ImageView) fish.get(0);
                 if (fishPositions.get(fishImageView) == null) {
                     Point2D fishPosition = new Point2D(0, 200);
                     fishPositions.put(fishImageView, fishPosition);
                     }
                 }
                 for (Node node : fishGroup.getChildren()) {
-                    ImageView fishImageView = (ImageView) node;
-                    TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(5), fishImageView);
-                    //fishTransition.setCycleCount(Animation.INDEFINITE);
-                    Point2D debut_fishPosition = fishPositions.get(fishImageView);
-                    fishTransition.setFromX(debut_fishPosition.getX());
-                    fishTransition.setFromY(debut_fishPosition.getY());
-                    double gotoX = 0;
-                    double gotoY = 0;
-                    RandomWayPoint(gotoX, gotoY);
-                    fishTransition.setToX(gotoX);
-                    fishTransition.setToY(gotoY);
-                    if (gotoX < debut_fishPosition.getX()) {
-                        fishImageView.setScaleX(-1);
-                    } else {
-                        fishImageView.setScaleX(1);
+                    Pane container = (Pane) node;
+                    List<Object> fish = (List<Object>) container.getUserData();
+                    ImageView fishImageView = (ImageView) fish.get(0);
+                    boolean started = (boolean) fish.get(1);
+                    if (started == true) {
+                        System.out.println("HERE !\n");
+                        TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(5), fishImageView);
+                        //fishTransition.setCycleCount(Animation.INDEFINITE);
+                        Point2D debut_fishPosition = fishPositions.get(fishImageView);
+                        fishTransition.setFromX(debut_fishPosition.getX());
+                        fishTransition.setFromY(debut_fishPosition.getY());
+                        double gotoX = 0;
+                        double gotoY = 0;
+                        RandomWayPoint(gotoX, gotoY);
+                        fishTransition.setToX(gotoX);
+                        fishTransition.setToY(gotoY);
+                        if (gotoX < debut_fishPosition.getX()) {
+                            fishImageView.setScaleX(-1);
+                        } else {
+                            fishImageView.setScaleX(1);
+                        }
+                        Point2D new_fishPosition = new Point2D(gotoX, gotoY);
+                        fishPositions.put(fishImageView, new_fishPosition);
+                        fishTransition.play();
                     }
-                    Point2D new_fishPosition = new Point2D(gotoX, gotoY);
-                    fishPositions.put(fishImageView, new_fishPosition);
-                    fishTransition.play();
                 }
                 try {
                     Thread.sleep(5000);
@@ -175,7 +192,8 @@ public class Client extends Application {
                 String userInput;
                 System.out.print("$ ");
                 while ((userInput = stdIn.readLine()) != null) {
-                    ExtractFish(userInput);
+                    addFish(userInput);
+                    StartFish(userInput);
                     out.println(userInput);
                 }
             } catch (IOException e) {
@@ -183,12 +201,77 @@ public class Client extends Application {
             }
         }
     }
+    private void printExtractedImageViews(Group extractedImageViews) {
+        for (Node node : extractedImageViews.getChildren()) {
+            ImageView imageView = (ImageView) node;
+            Image image = imageView.getImage();
+            String imageUrl = image.getUrl();
+            
+            System.out.println("Image URL: " + imageUrl);
+            System.out.println("Position: " + imageView.getLayoutX() + ", " + imageView.getLayoutY());
+        }
+    }
+
+
+    private void printFishGroup(Group fishGroup) {
+        for (Node node : fishGroup.getChildren()) {
+            Pane container = (Pane) node;
+            List<Object> fish = (List<Object>) container.getUserData();
+            ImageView fishImageView = (ImageView) fish.get(0);
+            Image fishImage = fishImageView.getImage();
+            String fishImageUrl = fishImage.getUrl();
+            boolean started = (boolean) fish.get(1);
+            
+            System.out.println("Fish image URL: " + fishImageUrl);
+            System.out.println("Started: " + started);
+            System.out.println("Position: " + container.getLayoutX() + ", " + container.getLayoutY());
+        }
+    }
 
     public void RandomWayPoint(double gotoX, double gotoY) {
         gotoX = Math.random()*500; 
         gotoY = Math.random()*400;
     }
-    public void ExtractFish(String userInput) {
+
+    public void UpdateImageViewsGroup() {
+        extractedImageViews.getChildren().clear();
+        for (Node node : fishGroup.getChildren()) {
+            Pane container = (Pane) node;
+            List<Object> fishData = (List<Object>) container.getUserData();
+            ImageView fishImageView = (ImageView) fishData.get(0);
+            extractedImageViews.getChildren().add(fishImageView);
+        }
+    }
+
+    public void StartFish(String userInput) {
+        Pattern pattern = Pattern.compile("startFish (\\w+)");
+        Matcher matcher = pattern.matcher(userInput);
+        if (matcher.find()) {
+            String fishName = matcher.group(1);
+            for (Node node : fishGroup.getChildren()) {
+                Pane container = (Pane) node;
+                List<Object> fish = (List<Object>) container.getUserData();
+                ImageView fishImageView = (ImageView) fish.get(0);
+                System.out.println(fish.get(2));
+                System.out.println(fishName.equals(fish.get(2)));
+                if (fishName.equals(fish.get(2))) { 
+                    Platform.runLater(() -> {
+                        fishGroup.getChildren().remove(container);
+                        List<Object> newFish = new ArrayList<>();
+                        newFish.add(fishImageView);
+                        newFish.add(true);
+                        Pane new_container = new Pane();
+                        new_container.setUserData(newFish);
+                        fishGroup.getChildren().add(new_container);
+                        UpdateImageViewsGroup();
+                    });
+                    break;
+                }
+            }
+        }
+    }
+
+    public void addFish(String userInput) {
         Pattern pattern = Pattern.compile("addFish\\s+(\\w+)\\s+at\\s+(\\d+x\\d+),\\s*(\\d+x\\d+)(?:,\\s*(\\w+))?");
         Matcher matcher = pattern.matcher(userInput);
         if (matcher.find()) {
@@ -217,15 +300,20 @@ public class Client extends Application {
             ImageView fishImageView = new ImageView(fishImage);
             fishImageView.setX(startX);
             fishImageView.setY(startY);
-            Platform.runLater(() -> {fishGroup.getChildren().add(fishImageView);});
+            List<Object> fish = new ArrayList<>();
+            fish.add(fishImageView);
+            fish.add(false);
+            fish.add(fishName);
+            Pane container = new Pane();
+            container.setUserData(fish);
+            Platform.runLater(() -> {
+                fishGroup.getChildren().add(container);
+                UpdateImageViewsGroup();
+            });
         }
-<<<<<<< HEAD
     }
 
-=======
-
-    }
->>>>>>> 09efa1ae9b4879079fa29d8642bd6e515247187e
+    
     public void close() {
         try {
             out.close();

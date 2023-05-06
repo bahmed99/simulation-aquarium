@@ -712,17 +712,16 @@ char *getFishesContinuously(Aquarium *aquarium, int client) {
             ViewWidth = aquarium->views[i].width;
         }
         for (int j = 0; j < aquarium->views[i].num_fishes; j++) {
-            destination = RandomPathWay(aquarium);
-            aquarium->views[i].fishes[j].coord.x = 0;
-            aquarium->views[i].fishes[j].coord.y = 0;
             Fish fish = aquarium->views[i].fishes[j];
-            if (fish.coord.x < ViewWidth && fish.coord.y < ViewHeight) {
-                sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
+            sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
+            destination = RandomWayPoint(aquarium);
+            aquarium->views[i].fishes[j].coord.x = destination[0]%ViewHeight;
+            aquarium->views[i].fishes[j].coord.y = destination[1]%ViewWidth;
             }
         }
-    }
     return FishList;
 }
+
 
 int *RandomWayPoint(Aquarium *aquarium)
 {

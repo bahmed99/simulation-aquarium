@@ -30,9 +30,8 @@ char *clientCommand[] = {
     "^ping [0-9]{1,5}$",
     "log out",
     "ls",
-    "getFishes"
-    "getFishesContinuously"
-
+    "getFishes",
+    "getFishesContinuously",
 };
 
 char *extractClientCommand[] = {
@@ -183,18 +182,20 @@ void *ClientHandler(void *client_fd)
                 close(*(int *)client_fd);
                 pthread_exit(NULL);
             }
-            else if (verifRegex(buffer, clientCommand[7]) == 1)
+            else if (strcmp(buffer, "getFishes") == 0)
             {
                 char *msg = getFishes(aquarium, *(int *)client_fd);
-
                 length_write = write(*(int *)client_fd, msg, strlen(msg));
 
             }
-            else if (verifRegex(buffer, clientCommand[8]) == 1)
+            else if (strcmp(buffer, "getFishesContinuously") == 0)
             {
-                char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
-
-                length_write = write(*(int *)client_fd, msg, strlen(msg));
+                for (int i = 0; i < 3; i ++) {
+                    char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
+                    length_write = write(*(int *)client_fd, msg, strlen(msg));
+                    msg = getFishesContinuously(aquarium, *(int *)client_fd);
+                    sleep(5);
+                }
                 
             }
             else

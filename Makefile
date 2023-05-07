@@ -30,4 +30,4 @@ logger_controller:
 	$(CC) $(CFLAGS) -c Controller/logger.c -o $(BUILD_DIR)/logger_controller.o
 
 clean:
-	find Build/ \( -iname '*.txt' -o -iname '*.cfg' \) -type f -delete
+	find Build/ \( -iname '*.txt' -o -iname '*.cfg' -o -iname '*.class' -o -iname '*.o' \) -type f -delete

@@ -32,7 +32,7 @@ import javafx.geometry.Point2D;
 
 
 public class Client extends Application {
-    private static String CONFIG_FILE_PATH = "./affichage.cfg";
+    private static String CONFIG_FILE_PATH = "./Build/affichage.cfg";
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
@@ -43,6 +43,7 @@ public class Client extends Application {
     private String controller_port;
     private String display_timeout_value;
     private boolean gFC = false;
+    private String resources;
     
     public static void main(String[] args) {
             launch(args);
@@ -58,6 +59,7 @@ public class Client extends Application {
             String server = props.getProperty("controller-address");
             id = props.getProperty("id");
             display_timeout_value = props.getProperty("display-timeout-value");
+            resources= props.getProperty("resources");
             
             int port = Integer.parseInt(controller_port);
 
@@ -68,6 +70,8 @@ public class Client extends Application {
                 out.println("hello in as " + id);
             else 
                 out.println("hello");
+
+            out.println("getFishesContinuously");
 
         } catch (Exception e) {
             System.err.println("Error loading config file: " + e.getMessage());
@@ -81,7 +85,7 @@ public class Client extends Application {
         String userInput;
         Group root = new Group(backgroundImageView, extractedImageViews);
             
-        Scene scene = new Scene(root, 1000, 1000);
+        Scene scene = new Scene(root, 500, 500);
         stage.setScene(scene);
         stage.show();
 
@@ -178,13 +182,15 @@ public class Client extends Application {
                 int bytesRead;
                 while ((bytesRead = in.read(buffer)) != -1) {
                     String response = new String(buffer, 0, bytesRead);
-                    System.out.print("  -> ");
-                    System.out.println(response.trim());
-                    if (gFC == true) {
-                        getFishesContinuously(response);
-                    }
+                    if(!response.equals("list "))
+                  {      System.out.print("   \n-> ");
+                        System.out.println(response.trim());
+                        // if (gFC == true) {
+                            getFishesContinuously(response);
+                            }
+                    // }
 
-                    System.out.print("$ ");
+                    
                 }
             } catch (IOException e) {
                 System.err.println("Error receiving message: " + e.getMessage());
@@ -201,9 +207,10 @@ public class Client extends Application {
                 while ((userInput = stdIn.readLine()) != null) {
                     addFish(userInput);
                     StartFish(userInput);
-                    if (userInput.equals("getFishesContinuously")) {
-                        gFC = true;
-                    }
+                    delFish(userInput);
+                    // if (userInput.equals("getFishesContinuously")) {
+                    //     gFC = true;
+                    // }
                     out.println(userInput);
                 }
             } catch (IOException e) {
@@ -327,6 +334,26 @@ public class Client extends Application {
         }
     }
 
+    public void delFish(String userInput){
+
+        Pattern pattern = Pattern.compile("delFish (\\w+)");
+        Matcher matcher = pattern.matcher(userInput);
+        if (matcher.find()) {
+            String fishName = matcher.group(1);
+            for (Node node : fishGroup.getChildren()) {
+                Pane container = (Pane) node;
+                List<Object> fish = (List<Object>) container.getUserData();
+                if (fishName.equals(fish.get(1))) { 
+                    Platform.runLater(() -> {
+                        fishGroup.getChildren().remove(container);
+                        UpdateImageViewsGroup();
+                    });
+                    break;
+                }
+            }
+        }
+    }
+
     public void getFishesContinuously(String userInput) {
         Pattern pattern = Pattern.compile("\\[(.*?) at (\\d+)x(\\d+), ?(\\d+)x(\\d+), ?(\\d+)(?:, ?(\\d+))?\\]");
         Matcher matcher = pattern.matcher(userInput);
@@ -365,7 +392,7 @@ public class Client extends Application {
                 }
             }
             if ( created == true ) {
-                String FishPath = "Images/Fish/"+fishName+".png";
+                String FishPath = resources+"/Fish/"+fishName+".png";
                 Image fishImage = new Image(FishPath, 100, 100, false, false);
                 ImageView fishImageView = new ImageView(fishImage);
                 List<Object> newfish = new ArrayList<>();

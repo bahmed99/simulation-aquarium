@@ -17,8 +17,8 @@ server: utils logger_controller
 	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
-	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls -d $(BUILD_DIR) View/Client.java 
-	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls -cp $(BUILD_DIR) Client
+	javac --module-path /usr/share/openjfx/lib --add-modules javafx.controls,javafx.fxml -d $(BUILD_DIR) View/Client.java 
+	java  --module-path /usr/share/openjfx/lib --add-modules javafx.controls,javafx.fxml -cp $(BUILD_DIR) Client
 
 
 interface:
@@ -30,4 +30,4 @@ logger_controller:
 	$(CC) $(CFLAGS) -c Controller/logger.c -o $(BUILD_DIR)/logger_controller.o
 
 clean:
-	find Build/ \( -iname '*.txt' -o -iname '*.cfg' -o -iname '*.class' -o -iname '*.o' \) -type f -delete
+	find Build/ \( -iname '*.txt' -o -iname '*.class' -o -iname '*.o' \) -type f -delete

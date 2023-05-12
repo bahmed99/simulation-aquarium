@@ -758,7 +758,6 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
                 {
                     Fish fish = aquarium->views[i].fishes[j];
 
-                    sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x % ViewWidth, fish.coord.y % ViewHeight, fish.height, fish.width, "5");
 
                     
                     destination = applyPathWay(aquarium, fish.mobilityPattern);
@@ -873,6 +872,9 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
 
 
                     }
+                    fish = aquarium->views[i].fishes[j];
+                    sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x % ViewWidth, fish.coord.y % ViewHeight, fish.height, fish.width, "5");
+
                     // fish = aquarium->views[i].fishes[j];
                     // aquarium->views[i].fishes[j].coord.x = destination[0] % ViewWidth;
                     // aquarium->views[i].fishes[j].coord.y = destination[1] % ViewHeight;

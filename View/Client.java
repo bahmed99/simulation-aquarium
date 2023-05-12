@@ -85,7 +85,7 @@ public class Client extends Application {
         String userInput;
         Group root = new Group(backgroundImageView, extractedImageViews);
             
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(root, 500, 500);
         // stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
@@ -140,17 +140,15 @@ public class Client extends Application {
                         fishTransition.setFromY(destinationsY.get(0));
                         fishTransition.setToX(destinationsX.get(1));
                         fishTransition.setToY(destinationsY.get(1));
+                        
                         if (destinationsX.get(1) < destinationsX.get(0)) {
                             fishImageView.setScaleX(-1);
                         } else {
                             fishImageView.setScaleX(1);
                         }
                         fishTransition.play();
-                         try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+
+
                         List<Object> newFish = new ArrayList<>();
 
                         destinationsX.remove(0);
@@ -174,7 +172,7 @@ public class Client extends Application {
                     }
                     
                 }
-                try {
+                    try {
                             Thread.sleep(5000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -364,13 +362,16 @@ public class Client extends Application {
     }
 
     public void getFishesContinuously(String userInput) {
-        Pattern pattern = Pattern.compile("\\[(.*?) at (\\d+)x(\\d+), ?(\\d+)x(\\d+), ?(\\d+)(?:, ?(\\d+))?\\]");
+        Pattern pattern = Pattern.compile("\\[(.*?) at (-?\\d+)x(-?\\d+), ?(\\d+)x(\\d+), ?(\\d+)(?:, ?(\\d+))?\\]");
         Matcher matcher = pattern.matcher(userInput);
         boolean created = true;
         while (matcher.find()) {
             String fishName = matcher.group(1);
             int posX = Integer.parseInt(matcher.group(2));
             int posY = Integer.parseInt(matcher.group(3));
+            System.out.println("posX: " + posX);
+            System.out.println("posY: " + posY);
+
             int sizeX = Integer.parseInt(matcher.group(4));
             int sizeY = Integer.parseInt(matcher.group(5));
             int time = Integer.parseInt(matcher.group(6));

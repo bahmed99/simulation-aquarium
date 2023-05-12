@@ -265,7 +265,7 @@ char *addFish(Aquarium *a, int client, char *name, int x, int y, int width, int 
             if (a->views[i].socket == client)
             {
 
-                if (x < 0 || x + (width * a->views[i].width / 100)  > a->views[i].width + a->views[i].coord.x || y < 0 || y + (height * a->views[i].height / 100)  > a->views[i].height + a->views[i].coord.y)
+                if (x < 0 || x + (width * a->views[i].width / 100) > a->views[i].width + a->views[i].coord.x || y < 0 || y + (height * a->views[i].height / 100) > a->views[i].height + a->views[i].coord.y)
                 {
 
                     message = "NOK: Les coordonnées du poisson sont en dehors des dimensions de vue\n";
@@ -709,71 +709,197 @@ char *getFishes(Aquarium *aquarium, int client)
     return FishList;
 }
 
-int abs(int a) {
-    if(a < 0) a=-a;
+int abs(int a)
+{
+    if (a < 0)
+        a = -a;
     return a;
-} 
+}
 
-int verifFishInView(int x,int y,View v){
-    if(x >= v.width + v.coord.x && y >= v.height + v.coord.y){
+int verifFishInView(int x, int y, View v)
+{
+    if(x >= v.coord.x && x <= v.coord.x + v.width && y >= v.coord.y && y <= v.coord.y + v.height)
         return 1;
-    }
+    
     return 0;
 }
 
 char *getFishesContinuously(Aquarium *aquarium, int client)
 {
+
+    logger_init("log_controller.txt");
+
     char *FishList = (char *)malloc(1000);
     int *destination;
     int ViewWidth = 0;
     int ViewHeight = 0;
     View viewClient;
+    for (int i=0;i<aquarium->num_views;i++)
+    {
+        if(aquarium->views[i].socket == client)
+        {
+            viewClient = aquarium->views[i];
+            
+        }
+    }
     strcpy(FishList, "list ");
     for (int i = 0; i < aquarium->num_views; i++)
     {
         if (aquarium->views[i].socket == client)
         {
-           
+
             ViewHeight = aquarium->views[i].height;
             ViewWidth = aquarium->views[i].width;
-            viewClient = aquarium->views[i];
+            
 
             for (int j = 0; j < aquarium->views[i].num_fishes; j++)
             {
                 if (aquarium->views[i].fishes[j].mobile == 1)
                 {
                     Fish fish = aquarium->views[i].fishes[j];
-                    sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x, fish.coord.y, fish.height, fish.width, "5");
+
+                    sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x % ViewWidth, fish.coord.y % ViewHeight, fish.height, fish.width, "5");
+
+                    
                     destination = applyPathWay(aquarium, fish.mobilityPattern);
-                    int w, h;
-                    w = aquarium->views[i].fishes[j].width;
-                    h = aquarium->views[i].fishes[j].height;
 
-                    // aquarium->views[i].fishes[j].coord.x = destination[0] - w < 0 ? destination[0] : w - destination[0];
-                    // aquarium->views[i].fishes[j].coord.y = destination[1] - h < 0 ? destination[1] : h - destination[1];
+                    
+                   
+                    if (verifFishInView(destination[0], destination[1], viewClient) == 1)
+                    {
 
-                    aquarium->views[i].fishes[j].coord.x = destination[0] % ViewWidth;
-                    aquarium->views[i].fishes[j].coord.y = destination[1] % ViewHeight;
+                        aquarium->views[i].fishes[j].coord.x = destination[0];
+                        aquarium->views[i].fishes[j].coord.y = destination[1];
+                    }
+
+                    else
+                    {
+                        if (viewClient.coord.x == 0 && viewClient.coord.y == 0)
+                        {
+                            if(destination[0]>ViewWidth && destination[1]>ViewHeight){
+
+                                // logger_log(INFO, "dest x  %d\n", destination[0]);
+                                // logger_log(INFO, "dest y  %d\n", destination[1]);
+
+                                // sleep(5);
+
+                                // aquarium->views[i].fishes[j].coord.x=500;
+                                // aquarium->views[i].fishes[j].coord.y=500;
+
+                                // char *FishList_inter = (char *)malloc(1000);
+                                // strcpy(FishList_inter, "list ");
+
+                                // sprintf(FishList_inter, "%s [%s at %dx%d, %dx%d, %s] ", FishList_inter, fish.name, 500 , 500 , fish.height, fish.width, "5");
+
+                                // strcat(FishList_inter, "\n");
+
+                                // write(client, FishList_inter, strlen(FishList_inter));
+
+            
+
+                                
+
+                                // sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, 500 , 500 , fish.height, fish.width, "5");
+
+
+                                // sleep(5);
+
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+                            }
+                            else if(destination[0]>ViewWidth && destination[1]<ViewHeight){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=destination[1];
+
+                            }
+                            else if(destination[0]<ViewWidth && destination[1]>ViewHeight){
+                                aquarium->views[i].fishes[j].coord.x=destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+
+                            }
+                        }
+                        else if (viewClient.coord.x == 0 && viewClient.coord.y != 0)
+                        {
+                            if(destination[0]>ViewWidth && destination[1]<viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=destination[0];
+                                aquarium->views[i].fishes[j].coord.y= -destination[1];
+                            }
+                            else if(destination[0]>ViewWidth && destination[1]>=viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=destination[1];
+
+                            }
+                            else if(destination[0]<ViewWidth &&  destination[1]<viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+
+                            }
+                        }
+                        else if (viewClient.coord.x != 0 && viewClient.coord.y == 0)
+                        {
+
+                            if(destination[0]<viewClient.coord.x && destination[1]>ViewHeight){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=destination[1];
+                            }
+                            else if(destination[0]>=viewClient.coord.x && destination[1]>ViewHeight){
+                                aquarium->views[i].fishes[j].coord.x=destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+
+                            }
+                            else if(destination[0]<viewClient.coord.x && destination[1]>ViewHeight){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+
+                            }
+                        }
+                        else if (viewClient.coord.x != 0 && viewClient.coord.y != 0)
+                        {
+                            if(destination[0]<viewClient.coord.x && destination[1]<viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+                            }
+                            else if(destination[0]>=viewClient.coord.x && destination[1]<viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=destination[0];
+                                aquarium->views[i].fishes[j].coord.y=-destination[1];
+
+                            }
+                            else if(destination[0]<viewClient.coord.x && destination[1]>=viewClient.coord.y){
+                                aquarium->views[i].fishes[j].coord.x=-destination[0];
+                                aquarium->views[i].fishes[j].coord.y=destination[1];
+
+                            }
+                        }
+
+
+                    }
+                    // fish = aquarium->views[i].fishes[j];
+                    // aquarium->views[i].fishes[j].coord.x = destination[0] % ViewWidth;
+                    // aquarium->views[i].fishes[j].coord.y = destination[1] % ViewHeight;
                     free(destination);
                 }
             }
         }
-        // else
-        // {
-        //     for (int j = 0; j < aquarium->views[i].num_fishes; j++)
-        //     {
-        //         if (aquarium->views[i].fishes[j].mobile == 1)
-        //         {
-        //             Fish fish = aquarium->views[i].fishes[j];
+        else
+        {
+            for (int j = 0; j < aquarium->views[i].num_fishes; j++)
+            {
+                if (aquarium->views[i].fishes[j].mobile == 1)
+                {
+                    Fish fish = aquarium->views[i].fishes[j];
+                    logger_log(INFO, "Fish %s at %dx%d, %dx%d, %s", fish.name, abs(fish.coord.x) , abs(fish.coord.y), fish.height, fish.width, "5");
+                    logger_log(INFO,"View %d %d %d %d", viewClient.coord.x, viewClient.coord.y, aquarium->views[i].width, aquarium->views[i].height);
 
-        //             if (verifFishInView(abs(fish.coord.x),abs(fish.coord.y),viewClient))
-        //             {
-        //                 sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, abs(fish.coord.x), abs(fish.coord.y), fish.height, fish.width, "5");
-        //             }
-        //         }
-        //     }
-        // }
+                    if (verifFishInView(abs(fish.coord.x), abs(fish.coord.y), viewClient))
+                    {
+                        sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, abs(fish.coord.x) % aquarium->views[i].width, abs(fish.coord.y) % aquarium->views[i].height, fish.height, fish.width, "5");
+                    }
+                }
+            }
+        }
     }
+    logger_close();
+
     return FishList;
 }
 

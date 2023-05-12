@@ -85,7 +85,8 @@ public class Client extends Application {
         String userInput;
         Group root = new Group(backgroundImageView, extractedImageViews);
             
-        Scene scene = new Scene(root, 500, 500);
+        Scene scene = new Scene(root, 800, 800);
+        // stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
 
@@ -145,6 +146,11 @@ public class Client extends Application {
                             fishImageView.setScaleX(1);
                         }
                         fishTransition.play();
+                         try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         List<Object> newFish = new ArrayList<>();
 
                         destinationsX.remove(0);
@@ -163,15 +169,18 @@ public class Client extends Application {
                             fishGroup.getChildren().set(index, newContainer);
                             UpdateImageViewsGroup();
                         });
-
+                        
+                    
                     }
+                    
                 }
                 try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
             }
+            
         }
     }
     private class ReceiverRunnable implements Runnable {
@@ -187,7 +196,7 @@ public class Client extends Application {
                         System.out.println(response.trim());
                         // if (gFC == true) {
                             getFishesContinuously(response);
-                            }
+                 }
                     // }
 
                     
@@ -371,9 +380,22 @@ public class Client extends Application {
                 if (fishName.equals(fish.get(1))) {
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
-                    destinationsX.add(posX);
-                    destinationsY.add(posY);
-
+                    if(posX<0 && posY<0){
+                        destinationsX.add(500);
+                        destinationsY.add(500);
+                    }
+                    else if(posX<0 && posY>0){
+                        destinationsX.add(500);
+                        destinationsY.add(posY);
+                    }
+                    else if(posX>=0 && posY<0){
+                        destinationsX.add(posX);
+                        destinationsY.add(500);
+                    }
+                    else{
+                        destinationsX.add(posX);
+                        destinationsY.add(posY);
+                    }
                     List<Object> newfish = new ArrayList<>();
                     newfish.add(fish.get(0));
                     newfish.add(fish.get(1));
@@ -389,36 +411,35 @@ public class Client extends Application {
                         fishGroup.getChildren().set(index, newContainer);
                         UpdateImageViewsGroup();
                     });
-                }
-            }
-            if ( created == true ) {
-                String FishPath = resources+"/Fish/"+fishName+".png";
-                Image fishImage = new Image(FishPath, 100, 100, false, false);
-                ImageView fishImageView = new ImageView(fishImage);
-                List<Object> newfish = new ArrayList<>();
-                List<Integer> destinationsX = new ArrayList<>();
-                destinationsX.set(0, posX);
-                List<Integer> destinationsY = new ArrayList<>();
-                destinationsY.set(0, posY);
-                
-                fishImageView.setX(destinationsX.get(0));
-                fishImageView.setY(destinationsX.get(1));
-
-                newfish.add(fishImageView);
-                newfish.add(fishName);
-                newfish.add(destinationsX);
-                newfish.add(destinationsY);
-                newfish.add(false);
-
-                Pane container = new Pane();
-                container.setUserData(newfish);
-                Platform.runLater(() -> {
-                    fishGroup.getChildren().add(container);
-                    UpdateImageViewsGroup();
-                });
             }
         }
+        if (created) {
+            String FishPath = resources + "/Fish/" + fishName + ".png";
+            Image fishImage = new Image(FishPath, 100, 100, false, false);
+            ImageView fishImageView = new ImageView(fishImage);
+            List<Object> newfish = new ArrayList<>();
+            List<Integer> destinationsX = new ArrayList<>(List.of(posX));
+            List<Integer> destinationsY = new ArrayList<>(List.of(posY));
+            
+            fishImageView.setX(destinationsX.get(0));
+            fishImageView.setY(destinationsY.get(0));
+
+            newfish.add(fishImageView);
+            newfish.add(fishName);
+            newfish.add(destinationsX);
+            newfish.add(destinationsY);
+            newfish.add(true);
+
+            Pane container = new Pane();
+            container.setUserData(newfish);
+            Platform.runLater(() -> {
+                fishGroup.getChildren().add(container);
+                UpdateImageViewsGroup();
+            });
+        }
     }
+}
+
     
     public void close() {
         try {

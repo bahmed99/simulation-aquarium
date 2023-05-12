@@ -1,0 +1,218 @@
+[INFO] 2023-05-12 16:48:42 Aquarium aquarium loaded (4 display view) !
+[INFO] lZ¬ U2023-05-12 16:48:51 Client 4 connected to view N1
+[INFO] lZ¬	2023-05-12 16:48:56 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 16:49:03 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] lZ¬ U2023-05-12 16:49:39 dest x  963
+
+[INFO] lZ¬ U2023-05-12 16:49:39 dest y  795
+
+[INFO] lZ¬ U2023-05-12 16:50:01 dest x  695
+
+[INFO] lZ¬ U2023-05-12 16:50:01 dest y  978
+
+[INFO] lZ¬ U2023-05-12 16:50:35 dest x  969
+
+[INFO] lZ¬ U2023-05-12 16:50:35 dest y  820
+
+[INFO] lZ¬ U2023-05-12 16:51:09 dest x  617
+
+[INFO] lZ¬ U2023-05-12 16:51:09 dest y  814
+
+[INFO] lZ¬ U2023-05-12 16:51:49 dest x  738
+
+[INFO] lZ¬ U2023-05-12 16:51:49 dest y  523
+
+[INFO] lZ¬ U2023-05-12 16:52:17 dest x  742
+
+[INFO] lZ¬ U2023-05-12 16:52:17 dest y  599
+
+[INFO] lZ¬ U2023-05-12 16:52:39 dest x  634
+
+[INFO] lZ¬ U2023-05-12 16:52:39 dest y  789
+
+[INFO] lZ¬ U2023-05-12 16:53:01 dest x  609
+
+[INFO] lZ¬ U2023-05-12 16:53:01 dest y  764
+
+[INFO] lZ¬ U2023-05-12 16:53:23 dest x  667
+
+[INFO] lZ¬ U2023-05-12 16:53:23 dest y  978
+
+[INFO] lZ¬ U2023-05-12 16:54:03 dest x  766
+
+[INFO] lZ¬ U2023-05-12 16:54:03 dest y  621
+
+[INFO] lZ¬ U2023-05-12 16:55:07 dest x  594
+
+[INFO] lZ¬ U2023-05-12 16:55:07 dest y  930
+
+[INFO] lZ¬ U2023-05-12 16:55:29 dest x  909
+
+[INFO] lZ¬ U2023-05-12 16:55:29 dest y  849
+
+[INFO] lZ¬ U2023-05-12 16:55:45 dest x  898
+
+[INFO] lZ¬ U2023-05-12 16:55:45 dest y  702
+
+[INFO] 2023-05-12 16:56:38 Aquarium aquarium loaded (4 display view) !
+[INFO] 5¸“U2023-05-12 16:56:43 Client 4 connected to view N1
+[INFO] 5¸	2023-05-12 16:56:50 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 16:56:57 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] 5¸“U2023-05-12 16:57:19 dest x  679
+
+[INFO] 5¸“U2023-05-12 16:57:19 dest y  658
+
+[INFO] 5¸“U2023-05-12 16:57:30 dest x  826
+
+[INFO] 5¸“U2023-05-12 16:57:30 dest y  999
+
+[INFO] 5¸“U2023-05-12 16:57:41 dest x  914
+
+[INFO] 5¸“U2023-05-12 16:57:41 dest y  992
+
+[ERROR] 2023-05-12 16:58:15 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] 5¸“U2023-05-12 16:58:15 Client 4 disconnected from view N1
+[INFO] 2023-05-12 16:58:28 Aquarium aquarium loaded (4 display view) !
+[INFO] |ÒV2023-05-12 16:58:33 Client 4 connected to view N1
+[INFO] |Ò	2023-05-12 16:58:35 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 16:58:39 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] |ÒV2023-05-12 16:59:39 dest x  567
+
+[INFO] |ÒV2023-05-12 16:59:39 dest y  699
+
+[INFO] |ÒV2023-05-12 17:00:02 dest x  700
+
+[INFO] |ÒV2023-05-12 17:00:02 dest y  643
+
+[INFO] |ÒV2023-05-12 17:00:31 dest x  903
+
+[INFO] |ÒV2023-05-12 17:00:31 dest y  622
+
+[INFO] |ÒV2023-05-12 17:00:48 dest x  899
+
+[INFO] |ÒV2023-05-12 17:00:48 dest y  951
+
+[INFO] |ÒV2023-05-12 17:00:59 dest x  976
+
+[INFO] |ÒV2023-05-12 17:00:59 dest y  572
+
+[ERROR] 2023-05-12 17:01:10 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] |ÒV2023-05-12 17:01:10 Client 4 disconnected from view N1
+[INFO] 2023-05-12 17:03:49 Aquarium aquarium loaded (4 display view) !
+[INFO] Œ™ğ©U2023-05-12 17:03:56 Client 4 connected to view N1
+[INFO] Œ™ğ	2023-05-12 17:03:59 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:04:03 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] 2023-05-12 17:04:08 dest x  581
+
+[INFO] 2023-05-12 17:04:08 dest y  708
+
+[INFO] Œ™ğ©U2023-05-12 17:04:43 dest x  774
+
+[INFO] Œ™ğ©U2023-05-12 17:04:43 dest y  618
+
+[INFO] Œ™ğ©U2023-05-12 17:05:00 dest x  994
+
+[INFO] Œ™ğ©U2023-05-12 17:05:00 dest y  571
+
+[INFO] Œ™ğ©U2023-05-12 17:05:29 dest x  747
+
+[INFO] Œ™ğ©U2023-05-12 17:05:29 dest y  696
+
+[INFO] Œ™ğ©U2023-05-12 17:05:40 dest x  735
+
+[INFO] Œ™ğ©U2023-05-12 17:05:40 dest y  910
+
+[INFO] Œ™ğ©U2023-05-12 17:05:51 dest x  650
+
+[INFO] Œ™ğ©U2023-05-12 17:05:51 dest y  839
+
+[ERROR] 2023-05-12 17:06:03 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] Œ™ğ©U2023-05-12 17:06:03 Client 4 disconnected from view N1
+[INFO] 2023-05-12 17:08:13 Aquarium aquarium loaded (4 display view) !
+[INFO] œ-.ÖU2023-05-12 17:08:19 Client 4 connected to view N1
+[INFO] 2023-05-12 17:08:43 Aquarium aquarium loaded (4 display view) !
+[INFO] ÜJMˆU2023-05-12 17:08:48 Client 4 connected to view N1
+[INFO] 2023-05-12 17:10:03 Aquarium aquarium loaded (4 display view) !
+[INFO] ğËR.^U2023-05-12 17:10:10 Client 4 connected to view N1
+[INFO] ğËR.^U2023-05-12 17:10:20 Client 5 connected to view N2
+[INFO] ğËR.	2023-05-12 17:10:30 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:10:35 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] p2023-05-12 17:10:38 Fish PoissonNain at 61x52, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:10:38 View 500 0 500 500
+[INFO] p2023-05-12 17:10:44 Fish PoissonNain at 93x671, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:10:44 View 500 0 500 500
+[INFO] p2023-05-12 17:10:50 Fish PoissonNain at 334x95, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:10:50 View 500 0 500 500
+[INFO] p2023-05-12 17:10:56 Fish PoissonNain at 158x893, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:10:56 View 500 0 500 500
+[INFO] p2023-05-12 17:11:02 Fish PoissonNain at 959x850, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:11:02 View 500 0 500 500
+[INFO] p2023-05-12 17:11:08 Fish PoissonNain at 701x241, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:11:08 View 500 0 500 500
+[INFO] p2023-05-12 17:11:14 Fish PoissonNain at 228x217, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:11:14 View 500 0 500 500
+[INFO] p2023-05-12 17:11:20 Fish PoissonNain at 379x276, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:11:20 View 500 0 500 500
+[INFO] ğËR.^U2023-05-12 17:11:26 Client 5 disconnected from view N2
+[INFO] p2023-05-12 17:11:26 Fish PoissonNain at 466x368, 3x4, 5
+[INFO] ğËR.?2023-05-12 17:11:26 View 0 0 500 500
+[INFO] p2023-05-12 17:11:26 Fish PoissonNain at 466x368, 3x4, 5
+[INFO] ğËR.^U2023-05-12 17:11:26 View 500 -9545613 500 500
+[ERROR] 2023-05-12 17:11:27 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] ğËR.^U2023-05-12 17:11:27 Client 4 disconnected from view N1
+[INFO] (2023-05-12 17:11:32 Aquarium aquarium displayed.
+[INFO] 2023-05-12 17:15:22 Aquarium aquarium loaded (4 display view) !
+[INFO] ğë`2023-05-12 17:15:29 Client 4 connected to view N1
+[INFO] ğë`2023-05-12 17:15:35 Fish PoissonNain added to view N1
+[ERROR] 2023-05-12 17:15:42 NOK : Le poisson PoissonNAin n'a pas Ã©tÃ© trouvÃ©
+
+[INFO] 2023-05-12 17:15:53 OK : Le poisson PoissonNain est en mouvement
+
+[ERROR] 2023-05-12 17:17:57 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] ğë`2023-05-12 17:17:57 Client 4 disconnected from view N1
+[INFO] 2023-05-12 17:18:21 Aquarium aquarium loaded (4 display view) !
+[INFO] ğëöU2023-05-12 17:18:26 Client 4 connected to view N1
+[INFO] ğë	2023-05-12 17:18:35 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:18:39 OK : Le poisson PoissonNain est en mouvement
+
+[ERROR] 2023-05-12 17:19:05 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] ğëöU2023-05-12 17:19:05 Client 4 disconnected from view N1
+[INFO] ğëöU2023-05-12 17:19:37 Client 4 connected to view N1
+[INFO] ğëöU2023-05-12 17:19:43 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:19:48 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] ğëöU2023-05-12 17:20:41 Client 4 disconnected from view N1
+[INFO] ğëöU2023-05-12 17:21:19 Client 4 connected to view N1
+[INFO] ğëöU2023-05-12 17:21:25 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:21:30 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] ğëöU2023-05-12 17:21:42 Client 4 disconnected from view N1
+[INFO] ğëöU2023-05-12 17:22:05 Client 4 connected to view N1
+[INFO] ğëöU2023-05-12 17:22:15 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:22:21 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] ğëöU2023-05-12 17:23:08 Client 4 disconnected from view N1
+[INFO] 2023-05-12 17:24:05 Aquarium aquarium loaded (4 display view) !
+[INFO] ğ{Îé\U2023-05-12 17:24:11 Client 4 connected to view N1
+[INFO] ğ{Îé	2023-05-12 17:24:13 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:24:21 OK : Le poisson PoissonNain est en mouvement
+
+[INFO] ğ{Îé\U2023-05-12 17:28:18 Client 4 disconnected from view N1
+[INFO] ğ{Îé\U2023-05-12 17:29:00 Client 4 connected to view N1
+[INFO] ğ{Îé\U2023-05-12 17:29:08 Fish PoissonNain added to view N1
+[INFO] 2023-05-12 17:29:13 OK : Le poisson PoissonNain est en mouvement
+
+[ERROR] 2023-05-12 17:30:40 NOK : Le poisson PoissonNain est dÃ©jÃ  en mouvement
+
+[INFO] ğ{Îé\U2023-05-12 17:30:40 Client 4 disconnected from view N1

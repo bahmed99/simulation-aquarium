@@ -73,7 +73,6 @@ void sendFishesContinuously(void* client_fd)
         if(msg != NULL){
             write(*(int *)client_fd, msg, strlen(msg));
         }
-        msg = getFishesContinuously(aquarium, *(int *)client_fd);
         sleep(fish_update_interval);
         free(msg);
    }
@@ -93,8 +92,12 @@ void *ClientHandler(void *client_fd)
     struct timeval timeout;
     timeout.tv_sec = display_timeout_value;
     timeout.tv_usec = 0;
+
+    pthread_t continuousFishesThread;
+
     while (1)
     {
+        
         int result = select(*(int *)client_fd + 1, &read_fds, NULL, NULL, &timeout);
         if (result == -1)
         {
@@ -208,9 +211,12 @@ void *ClientHandler(void *client_fd)
             {
                 //create a thread to send fishes continuously
 
-                pthread_t thread;
-                pthread_create(&thread, NULL,  (void *)sendFishesContinuously, (void *)client_fd);
-                pthread_detach(thread);
+                
+                pthread_create(&continuousFishesThread, NULL,  (void *)sendFishesContinuously, (void *)client_fd);
+                // pthread_detach(continuousFishesThread);
+                
+
+
                 // for (int i = 0; i < 3; i ++) {
                 //     char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
                 //     length_write = write(*(int *)client_fd, msg, strlen(msg));

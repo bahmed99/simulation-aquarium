@@ -1,19 +1,33 @@
+CC=gcc
+PATH_TO_FX=/home/bully/Desktop/javafx-sdk-20/lib
+BUILD_DIR=Build
+CFALGS=-Wall 
 
-all: utils test  view
+all: utils test view
 
-utils: 
-	gcc -c Controller/utils.c -o Build/utils.o
+utils: logger_controller
+	$(CC) $(CFLAGS) -c Controller/utils.c -o $(BUILD_DIR)/utils.o
 
 test: utils
-	gcc -c Controller/test.c -o Build/test.o
-	gcc Build/test.o Build/utils.o -o Build/test
-server: utils
-	gcc -c Controller/server.c -o Build/server.o
-	gcc Build/server.o Build/utils.o -o Build/server
+	$(CC) $(CFLAGS) -c Controller/test.c -o $(BUILD_DIR)/test.o
+	$(CC) $(CFLAGS) $(BUILD_DIR)/test.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/test
+
+server: utils logger_controller
+	$(CC) $(CFLAGS) -c Controller/server.c -o $(BUILD_DIR)/server.o
+	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
-	javac -d Build View/Client.java 
-	java -cp Build Client
-	
+	javac --module-path /home/bully/Desktop/javafx-sdk-20/lib --add-modules javafx.controls,javafx.fxml -d $(BUILD_DIR) View/Client.java 
+	java  --module-path /home/bully/Desktop/javafx-sdk-20/lib --add-modules javafx.controls,javafx.fxml -cp $(BUILD_DIR) Client
+
+
+interface:
+	javac --module-path $(PATH_TO_FX) --add-modules javafx.controls  -d Interface Interface/Aquarium.java
+	java  --module-path $(PATH_TO_FX) --add-modules javafx.controls  -cp Interface Aquarium
+
+
+logger_controller:
+	$(CC) $(CFLAGS) -c Controller/logger.c -o $(BUILD_DIR)/logger_controller.o
+
 clean:
-	rm -rf Build/*
+	find Build/ \( -iname '*.txt' -o -iname '*.class' -o -iname '*.o' \) -type f -delete

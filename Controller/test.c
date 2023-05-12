@@ -2,24 +2,12 @@
 #include <stdlib.h>
 #include "utils.h"
 
-
+#include <regex.h>
 
 
 int main() {
-    char * name = "aquarium";
-    Aquarium* a = loadAquarium(name);
-    if (a == NULL) {
-        printf("Erreur : impossible de charger l'aquarium\n");
-        exit(EXIT_FAILURE);
-    }
-    showAquarium(a);
-    printf("*********** \n");
-    addView(a,"N5",400,400,400,200);
-    printf("************ \n");
-    showAquarium(a);
-    printf("*********** \n");
-    deleteView(a,"N3");
-    printf("*********** \n");
-    showAquarium(a);
+   
+
+    printf("%d\n",782%500);
     return 0;
 }

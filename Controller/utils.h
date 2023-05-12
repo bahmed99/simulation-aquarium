@@ -53,7 +53,10 @@ struct View
     int width;
     int height;
     int num_fishes;
+    int num_fishes_visitors;
     Fish *fishes;
+    Fish fishes_visitors[50];
+    int fishes_visitors_view[50];
     int socket;
 };
 typedef struct View View;

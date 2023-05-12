@@ -28,8 +28,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.scene.Node;
 import javafx.geometry.Point2D;
-
-
+import javafx.stage.Screen;
 
 public class Client extends Application {
     private static String CONFIG_FILE_PATH = "./Build/affichage.cfg";
@@ -73,9 +72,16 @@ public class Client extends Application {
 
             out.println("getFishesContinuously");
 
+
         } catch (Exception e) {
             System.err.println("Error loading config file: " + e.getMessage());
         }
+
+        Screen screen = Screen.getPrimary();
+        double width = screen.getBounds().getWidth();
+        double height = screen.getBounds().getHeight();
+        stage.setX(width *0.5);
+        stage.setY(height );
 
         Image backgroundImage = new Image("Images/aquarium.jpg");
         backgroundImageView = new ImageView(backgroundImage);
@@ -84,6 +90,9 @@ public class Client extends Application {
         Scanner scanner = new Scanner(System.in);
         String userInput;
         Group root = new Group(backgroundImageView, extractedImageViews);
+
+
+
             
         Scene scene = new Scene(root, 500, 500);
         // stage.setResizable(false);
@@ -134,7 +143,8 @@ public class Client extends Application {
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
                     boolean started = (boolean) fish.get(4);
-                    if (started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
+                    int x = (int) fish.get(5);
+                    if (x<2 && started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
                         TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(5), fishImageView);
                         fishTransition.setFromX(destinationsX.get(0));
                         fishTransition.setFromY(destinationsY.get(0));
@@ -159,6 +169,7 @@ public class Client extends Application {
                         newFish.add(destinationsX);
                         newFish.add(destinationsY);
                         newFish.add(true);
+                        newFish.add(x==0?0:1);
 
                         Pane newContainer = new Pane();
                         newContainer.setUserData(newFish);
@@ -192,13 +203,17 @@ public class Client extends Application {
                     if(!response.equals("list "))
                   {      System.out.print("   \n-> ");
                         System.out.println(response.trim());
+                         System.out.print("$ ");
+
                         // if (gFC == true) {
                             getFishesContinuously(response);
                  }
                     // }
-
+                 
                     
                 }
+                 System.out.print("$ ");
+
             } catch (IOException e) {
                 System.err.println("Error receiving message: " + e.getMessage());
             }
@@ -212,13 +227,17 @@ public class Client extends Application {
                 String userInput;
                 System.out.print("$ ");
                 while ((userInput = stdIn.readLine()) != null) {
+                  
+                        
                     addFish(userInput);
                     StartFish(userInput);
                     delFish(userInput);
                     // if (userInput.equals("getFishesContinuously")) {
                     //     gFC = true;
                     // }
+                     
                     out.println(userInput);
+
                 }
             } catch (IOException e) {
                 System.err.println("Error sending message: " + e.getMessage());
@@ -284,6 +303,7 @@ public class Client extends Application {
                         newFish.add(fish.get(2));
                         newFish.add(fish.get(3));
                         newFish.add(true);
+                        newFish.add(fish.get(5));
                         Pane new_container = new Pane();
                         new_container.setUserData(newFish);
                         fishGroup.getChildren().add(new_container);
@@ -332,6 +352,7 @@ public class Client extends Application {
             fish.add(destinationsX);
             fish.add(destinationsY);
             fish.add(false);
+            fish.add(0);
             Pane container = new Pane();
             container.setUserData(fish);
             Platform.runLater(() -> {
@@ -369,9 +390,6 @@ public class Client extends Application {
             String fishName = matcher.group(1);
             int posX = Integer.parseInt(matcher.group(2));
             int posY = Integer.parseInt(matcher.group(3));
-            System.out.println("posX: " + posX);
-            System.out.println("posY: " + posY);
-
             int sizeX = Integer.parseInt(matcher.group(4));
             int sizeY = Integer.parseInt(matcher.group(5));
             int time = Integer.parseInt(matcher.group(6));
@@ -381,28 +399,36 @@ public class Client extends Application {
                 if (fishName.equals(fish.get(1))) {
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
+                    List<Object> newfish = new ArrayList<>();
+                    int marked=0;
+
                     if(posX<0 && posY<0){
                         destinationsX.add(500);
                         destinationsY.add(500);
+                        marked=(int)fish.get(5)+1;
                     }
                     else if(posX<0 && posY>0){
                         destinationsX.add(500);
                         destinationsY.add(posY);
+                        marked=(int)fish.get(5)+1;
+
                     }
                     else if(posX>=0 && posY<0){
                         destinationsX.add(posX);
                         destinationsY.add(500);
+                        marked=(int)fish.get(5)+1;
+
                     }
                     else{
                         destinationsX.add(posX);
                         destinationsY.add(posY);
                     }
-                    List<Object> newfish = new ArrayList<>();
                     newfish.add(fish.get(0));
                     newfish.add(fish.get(1));
                     newfish.add(destinationsX);
                     newfish.add(destinationsY);
                     newfish.add(fish.get(4));
+                    newfish.add(marked);
 
                     Pane newContainer = new Pane();
                     newContainer.setUserData(newfish);
@@ -430,6 +456,7 @@ public class Client extends Application {
             newfish.add(destinationsX);
             newfish.add(destinationsY);
             newfish.add(true);
+            newfish.add(0);
 
             Pane container = new Pane();
             container.setUserData(newfish);

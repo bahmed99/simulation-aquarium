@@ -86,7 +86,7 @@ void sendFishesContinuously(void* client_fd)
         if(msg != NULL){
             write(*(int *)client_fd, msg, strlen(msg));
         }
-        sleep(fish_update_interval);
+        sleep(20);
         free(msg);
    }
 }
@@ -107,6 +107,7 @@ void *ClientHandler(void *client_fd)
     timeout.tv_usec = 0;
 
     pthread_t continuousFishesThread;
+    int is_continuousFishesThread = 0;
 
     while (1)
     {
@@ -220,11 +221,11 @@ void *ClientHandler(void *client_fd)
                 length_write = write(*(int *)client_fd, msg, strlen(msg));
 
             }
-            else if (strcmp(buffer, "getFishesContinuously") == 0)
+            else if (strcmp(buffer, "getFishesContinuously") == 0 && is_continuousFishesThread  == 0)
             {
                 //create a thread to send fishes continuously
 
-                
+                is_continuousFishesThread = 1;
                 pthread_create(&continuousFishesThread, NULL,  (void *)sendFishesContinuously, (void *)client_fd);
                 // pthread_detach(continuousFishesThread);
                 

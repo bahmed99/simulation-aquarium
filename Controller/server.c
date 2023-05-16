@@ -86,7 +86,7 @@ void sendFishesContinuously(void* client_fd)
         if(msg != NULL){
             write(*(int *)client_fd, msg, strlen(msg));
         }
-        sleep(20);
+        sleep(fish_update_interval);
         free(msg);
    }
 }
@@ -228,7 +228,6 @@ void *ClientHandler(void *client_fd)
                 is_continuousFishesThread = 1;
                 pthread_create(&continuousFishesThread, NULL,  (void *)sendFishesContinuously, (void *)client_fd);
                 // pthread_detach(continuousFishesThread);
-                
 
 
                 // for (int i = 0; i < 3; i ++) {

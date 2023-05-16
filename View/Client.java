@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;  
+import javafx.concurrent.Task;
 
 import javafx.scene.layout.Pane;
 import javafx.animation.Animation;
@@ -86,6 +87,9 @@ public class Client extends Application {
         double width = screen.getBounds().getWidth();
         double height = screen.getBounds().getHeight();
 
+        stage.setWidth(width/2);
+        stage.setHeight(height);
+
         Image backgroundImage = new Image("Images/aquarium.jpg");
         backgroundImageView = new ImageView(backgroundImage);
         fishGroup = new Group();
@@ -98,14 +102,14 @@ public class Client extends Application {
 
             
         Scene scene = new Scene(root, 500, 500);
-        // stage.setResizable(false);
+        //stage.setResizable(false);
         //stage.setResizable(false);
         stage.setTitle(id);
         stage.setScene(scene);
+        
         stage.show();
 
-
-        Thread aquariumThread = new Thread(new AquariumRunnable());
+        Thread aquariumThread = new Thread(new AquariumRunnable(stage));
         aquariumThread.setDaemon(true);
         aquariumThread.start();
 
@@ -121,7 +125,6 @@ public class Client extends Application {
         pingThread.setDaemon(true);
         pingThread.start();
     }
-
     private class PingRunnable implements Runnable{
         @Override
         public void run() {
@@ -137,12 +140,15 @@ public class Client extends Application {
     }
 
     private class AquariumRunnable implements Runnable {
+        private Stage stage;
+        public AquariumRunnable(Stage stage) {
+            this.stage = stage;
+        }
         @Override
         public void run() {
             while (true) {
-                boolean need_sleep = false;
-                CountDownLatch latch = new CountDownLatch(1);
                 List<Node> fishGroupCopy = new ArrayList<>(fishGroup.getChildren());
+                fishGroupLock.lock();
                 for (Node node : fishGroupCopy) {
                     Pane container = (Pane) node;
                     List<Object> fish = (List<Object>) container.getUserData();
@@ -152,40 +158,37 @@ public class Client extends Application {
                     boolean started = (boolean) fish.get(4);
                     int x = (int) fish.get(5);
                     if (started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
-                        need_sleep = true;
-                        TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(2), fishImageView);
-                        System.out.println("pox X0: "+destinationsX.get(0)+" pos Y0 :"+destinationsY.get(0));
-                        System.out.println("pox X1: "+destinationsX.get(1)+" pos Y1 :"+destinationsY.get(1));
-                        if (destinationsX.get(1) < 0 || destinationsY.get(1) < 0) {
-                            Platform.runLater(() -> {
-                                //fishGroupLock.lock();
-                                System.out.println("REMOVE!");
-                                fishGroup.getChildren().remove(container);
-                                UpdateImageViewsGroup();
-                                //fishGroupLock.unlock();
-                            });
-                            try {
-                                Thread.sleep(5000); // Sleep here, giving the JavaFX Application Thread time to execute the removal
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                        TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(3), fishImageView);
+                        double initialX = fishImageView.getLayoutX();
+                        double initialY = fishImageView.getLayoutY();
+                        fishTransition.setFromX(destinationsX.get(0) - initialX);
+                        fishTransition.setFromY(destinationsY.get(0) - initialY);
+                        fishTransition.setToX(destinationsX.get(1) - initialX);
+                        fishTransition.setToY(destinationsY.get(1) - initialY);
+                        if (destinationsX.get(1) < destinationsX.get(0)) {
+                            fishImageView.setScaleX(-1);
                         } else {
-                            fishTransition.setFromX(destinationsX.get(0));
-                            fishTransition.setFromY(destinationsY.get(0));
-                            fishTransition.setToX(destinationsX.get(1));
-                            fishTransition.setToY(destinationsY.get(1));
-                            
-                            if (destinationsX.get(1) < destinationsX.get(0)) {
-                                fishImageView.setScaleX(-1);
-                            } else {
-                                fishImageView.setScaleX(1);
-                            }
+                            fishImageView.setScaleX(1);
+                        }
+                        destinationsX.remove(0);
+                        destinationsY.remove(0);
+                        if (destinationsX.get(0) < 0 || destinationsY.get(0) < 0) {
+                            Task<Void> task = new Task<Void>() {
+                                @Override
+                                protected Void call() throws Exception {
+                                    Platform.runLater(() -> {
+                                        fishImageView.setVisible(false);
+                                        fishGroup.getChildren().remove(container);
+                                        extractedImageViews.getChildren().remove(container);
+                                    });
+
+                                    return null;
+                                }
+                            };
+                            new Thread(task).start();
+                        } else {
                             fishTransition.play();
-                            
                             List<Object> newFish = new ArrayList<>();
-                            
-                            destinationsX.remove(0);
-                            destinationsY.remove(0);
                             
                             newFish.add(fish.get(0));
                             newFish.add(fish.get(1));
@@ -197,20 +200,20 @@ public class Client extends Application {
                             Pane newContainer = new Pane();
                             newContainer.setUserData(newFish);
                             Platform.runLater(() -> {
-                                //fishGroupLock.lock();
                                 int index = fishGroup.getChildren().indexOf(container);
                                 fishGroup.getChildren().set(index, newContainer);
                                 UpdateImageViewsGroup();
-                                //fishGroupLock.unlock();
+                                 
                             });
                         }
                     }
                 }
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                fishGroupLock.unlock();
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             
         }
@@ -223,17 +226,14 @@ public class Client extends Application {
                 int bytesRead;
                 while ((bytesRead = in.read(buffer)) != -1) {
                     String response = new String(buffer, 0, bytesRead);
-                    if(!response.equals("list "))
-                  {      System.out.print("   \n-> ");
+                    if(!response.equals("list ")){
+                        System.out.print("   \n-> ");
                         System.out.println(response.trim());
-                         System.out.print("$ ");
-
-                        // if (gFC == true) {
-                            getFishesContinuously(response);
-                 }
-                    // }
-                 
-                    
+                        System.out.print("$ ");
+                        fishGroupLock.lock();
+                        getFishesContinuously(response);
+                        fishGroupLock.unlock();
+                    }
                 }
                  System.out.print("$ ");
 
@@ -259,44 +259,13 @@ public class Client extends Application {
                     //     gFC = true;
                     // }
                      
-                    out.println(userInput);
+                   out.println(userInput);
 
                 }
             } catch (IOException e) {
                 System.err.println("Error sending message: " + e.getMessage());
             }
         }
-    }
-    private void printExtractedImageViews(Group extractedImageViews) {
-        for (Node node : extractedImageViews.getChildren()) {
-            ImageView imageView = (ImageView) node;
-            Image image = imageView.getImage();
-            String imageUrl = image.getUrl();
-            
-            System.out.println("Image URL: " + imageUrl);
-            System.out.println("Position: " + imageView.getLayoutX() + ", " + imageView.getLayoutY());
-        }
-    }
-
-
-    private void printFishGroup(Group fishGroup) {
-        for (Node node : fishGroup.getChildren()) {
-            Pane container = (Pane) node;
-            List<Object> fish = (List<Object>) container.getUserData();
-            ImageView fishImageView = (ImageView) fish.get(0);
-            Image fishImage = fishImageView.getImage();
-            String fishImageUrl = fishImage.getUrl();
-            boolean started = (boolean) fish.get(1);
-            
-            System.out.println("Fish image URL: " + fishImageUrl);
-            System.out.println("Started: " + started);
-            System.out.println("Position: " + container.getLayoutX() + ", " + container.getLayoutY());
-        }
-    }
-
-    public void RandomWayPoint(double gotoX, double gotoY) {
-        gotoX = Math.random()*500; 
-        gotoY = Math.random()*400;
     }
 
     public void UpdateImageViewsGroup() {
@@ -320,7 +289,7 @@ public class Client extends Application {
                 if (fishName.equals(fish.get(1))) { 
                     CountDownLatch latch = new CountDownLatch(1);
                     Platform.runLater(() -> {
-                        //fishGroupLock.lock();
+                         
                         fishGroup.getChildren().remove(container);
                         List<Object> newFish = new ArrayList<>();
                         newFish.add(fish.get(0));
@@ -333,7 +302,7 @@ public class Client extends Application {
                         new_container.setUserData(newFish);
                         fishGroup.getChildren().add(new_container);
                         UpdateImageViewsGroup();
-                        //fishGroupLock.unlock();
+                         
                     });
                     break;
                 }
@@ -368,6 +337,12 @@ public class Client extends Application {
             String FishPath = "Images/Fish/"+fishName+".png";
             Image fishImage = new Image(FishPath, 100, 100, false, false);
             ImageView fishImageView = new ImageView(fishImage);
+            fishImageView.setTranslateX(fishImageView.getFitWidth() / 2);
+            fishImageView.setTranslateY(fishImageView.getFitHeight() / 2);
+
+
+            fishImageView.setTranslateX(fishImageView.getFitWidth() / 2);
+            fishImageView.setTranslateY(fishImageView.getFitHeight() / 2);
             fishImageView.setLayoutX(startX);
             fishImageView.setLayoutY(startY);
             List<Object> fish = new ArrayList<>();
@@ -385,11 +360,11 @@ public class Client extends Application {
             CountDownLatch latch = new CountDownLatch(1);
             container.setUserData(fish);
             Platform.runLater(() -> {
-                //fishGroupLock.lock();
+                 
                 fishGroup.getChildren().add(container);
                 UpdateImageViewsGroup();
                 latch.countDown();
-                //fishGroupLock.unlock();
+                 
             });
         }
     }
@@ -405,11 +380,9 @@ public class Client extends Application {
                 List<Object> fish = (List<Object>) container.getUserData();
                 if (fishName.equals(fish.get(1))) { 
                     CountDownLatch latch = new CountDownLatch(1);
-                    Platform.runLater(() -> {
-                        //fishGroupLock.lock();
+                    Platform.runLater(() -> {                         
                         fishGroup.getChildren().remove(container);
-                        UpdateImageViewsGroup();
-                        //fishGroupLock.unlock();
+                        UpdateImageViewsGroup();                         
                     });
                     break;
                 }
@@ -437,10 +410,10 @@ public class Client extends Application {
                     List<Object> newfish = new ArrayList<>();
                     int marked=0;
                     if(posX<0 && posY<0){
-                        if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {                            destinationsX.add(500);
-                            destinationsX.add(500);
+                        if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {                            
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
                             destinationsX.add(posX);
-                            destinationsY.add(500);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -450,7 +423,7 @@ public class Client extends Application {
                     }
                     else if(posX<0 && posY>0){
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
-                            destinationsX.add(500);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
                             destinationsX.add(posX);
                             destinationsY.add(posY);
                             destinationsY.add(posY);
@@ -465,7 +438,7 @@ public class Client extends Application {
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
                             destinationsX.add(posX);
                             destinationsX.add(posX);
-                            destinationsY.add(500);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -488,12 +461,10 @@ public class Client extends Application {
                     Pane newContainer = new Pane();
                     newContainer.setUserData(newfish);
                     create = false;
-                    Platform.runLater(() -> {
-                        //fishGroupLock.lock();
+                    Platform.runLater(() -> {                         
                         int index = fishGroup.getChildren().indexOf(container);
                         fishGroup.getChildren().set(index, newContainer);
-                        UpdateImageViewsGroup();
-                        //fishGroupLock.unlock(); 
+                        UpdateImageViewsGroup();                          
                     });
             }
         }
@@ -505,15 +476,13 @@ public class Client extends Application {
                 List<Object> newfish = new ArrayList<>();
                 List<Integer> destinationsX = new ArrayList<>();
                 List<Integer> destinationsY = new ArrayList<>();
-                if (posX >= 0 && posY >= 0) {
-                    destinationsX.add(500);
-                    destinationsY.add(500);
-                }
+                destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
+                destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
                 destinationsX.add(posX);
                 destinationsY.add(posY);
 
-                fishImageView.setX(destinationsX.get(0));
-                fishImageView.setY(destinationsY.get(0));
+                fishImageView.setLayoutX(destinationsX.get(0));
+                fishImageView.setLayoutY(destinationsY.get(0));
 
                 newfish.add(fishImageView);
                 newfish.add(fishName);
@@ -525,11 +494,8 @@ public class Client extends Application {
                 Pane container = new Pane();
                 container.setUserData(newfish);
                 Platform.runLater(() -> {
-                    //fishGroupLock.lock();
                     fishGroup.getChildren().add(container);
                     UpdateImageViewsGroup();
-                    latch.countDown();
-                    //fishGroupLock.unlock();
                 });
             }
         }

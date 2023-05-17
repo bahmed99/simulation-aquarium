@@ -155,38 +155,66 @@ public class Client extends Application {
                     ImageView fishImageView = (ImageView) fish.get(0);
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
+                    System.out.println(destinationsX.toString());
+                    System.out.println(destinationsY.toString());
                     boolean started = (boolean) fish.get(4);
                     int x = (int) fish.get(5);
                     if (started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
-                        TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(3), fishImageView);
+                        TranslateTransition fishTransition = new TranslateTransition(Duration.seconds(4), fishImageView);
                         double initialX = fishImageView.getLayoutX();
                         double initialY = fishImageView.getLayoutY();
                         fishTransition.setFromX(destinationsX.get(0) - initialX);
                         fishTransition.setFromY(destinationsY.get(0) - initialY);
                         fishTransition.setToX(destinationsX.get(1) - initialX);
                         fishTransition.setToY(destinationsY.get(1) - initialY);
-                        if (destinationsX.get(1) < destinationsX.get(0)) {
-                            fishImageView.setScaleX(-1);
-                        } else {
-                            fishImageView.setScaleX(1);
-                        }
-                        destinationsX.remove(0);
-                        destinationsY.remove(0);
-                        if (destinationsX.get(0) < 0 || destinationsY.get(0) < 0) {
-                            Task<Void> task = new Task<Void>() {
-                                @Override
-                                protected Void call() throws Exception {
-                                    Platform.runLater(() -> {
-                                        fishImageView.setVisible(false);
-                                        fishGroup.getChildren().remove(container);
-                                        extractedImageViews.getChildren().remove(container);
-                                    });
+                    
+                        if (destinationsX.get(1) < 0 || destinationsY.get(1) < 0) {
+                            TranslateTransition fishTransition2 = new TranslateTransition(Duration.seconds(4), fishImageView);
+                            fishTransition2.setFromX(destinationsX.get(0) - initialX);
+                            fishTransition2.setFromY(destinationsY.get(0) - initialY);
+                            fishTransition2.setToX(destinationsX.get(1) - initialX);
+                            fishTransition2.setToY(destinationsY.get(1) - initialY);
+                            
+                            if (destinationsX.get(1) < destinationsX.get(0)) {
+                                fishImageView.setScaleX(-1);
+                            } else {
+                                fishImageView.setScaleX(1);
+                            }
+                            // destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            // List<Integer> forbiddenX = = new ArrayList<>();
+                            // forbiddenX.add(id.equals("N2") || id.equals("N4") ? -700 : 700)
+                            // List<Integer> forbiddenY = = new ArrayList<>();
+                            // forbiddenY.add(id.equals("N1") || id.equals("N2") ? 700 : -700)
+                            if (destinationsX.get(0) >= 0 && (destinationsX.get(0) != 700 &&  destinationsY.get(0) != 700)&& destinationsY.get(0) >= 0) {
+                                fishTransition2.play();
+                            }
+                            destinationsX.remove(0);
+                            destinationsY.remove(0);
+                            while (destinationsX.size() >= 2 && (destinationsX.get(0) < 0 || destinationsY.get(0) < 0)) {
+                                destinationsX.remove(0);
+                                destinationsY.remove(0);
+                            }
+                            // Task<Void> task = new Task<Void>() {
+                            //     @Override
+                            //     protected Void call() throws Exception {
+                            //         Platform.runLater(() -> {
+                            //             fishImageView.setVisible(false);
+                            //             fishGroup.getChildren().remove(container);
+                            //             extractedImageViews.getChildren().remove(container);
+                            //         });
 
-                                    return null;
-                                }
-                            };
-                            new Thread(task).start();
+                            //         return null;
+                            //     }
+                            // };
+                            // new Thread(task).start();
                         } else {
+                            if (destinationsX.get(1) < destinationsX.get(0)) {
+                                fishImageView.setScaleX(-1);
+                                } else {
+                                    fishImageView.setScaleX(1);
+                                }
+                            destinationsX.remove(0);
+                            destinationsY.remove(0);
                             fishTransition.play();
                             List<Object> newFish = new ArrayList<>();
                             
@@ -210,7 +238,7 @@ public class Client extends Application {
                 }
                 fishGroupLock.unlock();
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -410,10 +438,10 @@ public class Client extends Application {
                     List<Object> newfish = new ArrayList<>();
                     int marked=0;
                     if(posX<0 && posY<0){
-                        if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {                            
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
+                        if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {         
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
                             destinationsX.add(posX);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -423,7 +451,7 @@ public class Client extends Application {
                     }
                     else if(posX<0 && posY>0){
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
                             destinationsX.add(posX);
                             destinationsY.add(posY);
                             destinationsY.add(posY);
@@ -438,7 +466,7 @@ public class Client extends Application {
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
                             destinationsX.add(posX);
                             destinationsX.add(posX);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -447,9 +475,43 @@ public class Client extends Application {
                         }
 
                     }
-                    else{
-                        destinationsX.add(posX);
-                        destinationsY.add(posY);
+                    else if (posX>=0 && posY>=0){ 
+    
+                        if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1)< 0) {
+                            //destinationsX.remove(destinationsX.size() - 1);
+                            destinationsY.remove(destinationsY.size() - 1);
+                            //System.out.println("UP pos 2 +"); 
+                            //destinationsX.add(posX);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+
+                            destinationsX.add(posX);
+                            destinationsY.add(posY);
+                        }
+                        else if (destinationsX.get(destinationsX.size() - 1) < 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
+                            destinationsX.remove(destinationsX.size() - 1);
+                            //destinationsY.remove(destinationsY.size() - 1);
+                            //System.out.println("UP pos 2 ++"); 
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                            //destinationsY.add(posY);
+
+                            destinationsX.add(posX);
+                            destinationsY.add(posY);  
+                        } 
+                        else if (destinationsX.get(destinationsX.size() - 1) < 0 && destinationsY.get(destinationsY.size() - 1) < 0) {
+                            destinationsX.remove(destinationsX.size() - 1);
+                            destinationsY.remove(destinationsY.size() - 1);
+                            //System.out.println("UP pos 2 +++"); 
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            
+                            destinationsX.add(posX);
+                            destinationsY.add(posY);  
+                        } 
+                        else {
+                            //System.out.println("UP pos 2 ++++"); 
+                            destinationsX.add(posX);
+                            destinationsY.add(posY);
+                        }
                     }
                     newfish.add(fish.get(0));
                     newfish.add(fish.get(1));
@@ -476,8 +538,8 @@ public class Client extends Application {
                 List<Object> newfish = new ArrayList<>();
                 List<Integer> destinationsX = new ArrayList<>();
                 List<Integer> destinationsY = new ArrayList<>();
-                destinationsX.add(id.equals("N2") || id.equals("N4") ? -1000 : 1000);
-                destinationsY.add(id.equals("N1") || id.equals("N2") ? 1000 : -1000);
+                destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
                 destinationsX.add(posX);
                 destinationsY.add(posY);
 

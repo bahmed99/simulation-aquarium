@@ -49,6 +49,7 @@ public class Client extends Application {
     private String display_timeout_value;
     private boolean gFC = false;
     private String resources;
+    private Stage stage;
     
     public static void main(String[] args) {
             launch(args);
@@ -56,13 +57,14 @@ public class Client extends Application {
 
     @Override
     public void start(Stage stage) {
+        this.stage = stage;
         Properties props = new Properties();
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE_PATH)) {
             props.load(fis);
 
             controller_port = props.getProperty("controller-port");
             String server = props.getProperty("controller-address");
-            id = props.getProperty("id");
+            String id_greeting = props.getProperty("id");
             display_timeout_value = props.getProperty("display-timeout-value");
             resources= props.getProperty("resources");
             
@@ -72,7 +74,7 @@ public class Client extends Application {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             if(id != null)
-                out.println("hello in as " + id);
+                out.println("hello in as " + id_greeting);
             else 
                 out.println("hello");
 
@@ -261,6 +263,7 @@ public class Client extends Application {
                         fishGroupLock.lock();
                         getFishesContinuously(response);
                         fishGroupLock.unlock();
+                        getId(response);
                     }
                 }
                  System.out.print("$ ");
@@ -304,6 +307,13 @@ public class Client extends Application {
             ImageView fishImageView = (ImageView) fishData.get(0);
             extractedImageViews.getChildren().add(fishImageView);
         }
+    }
+    private void getId(String userInput){
+        Pattern pattern = Pattern.compile("greeting (\\w+)");
+        Matcher matcher = pattern.matcher(userInput);
+        if (matcher.find()) {
+            id=matcher.group(1);
+            Platform.runLater(() -> stage.setTitle(id));        }
     }
 
     public void StartFish(String userInput) {

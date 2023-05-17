@@ -17,8 +17,8 @@ server: utils logger_controller
 	$(CC) $(CFLAGS) $(BUILD_DIR)/server.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/logger_controller.o -o $(BUILD_DIR)/server
 
 view: 
-	javac --module-path /home/bully/Desktop/javafx-sdk-20/lib --add-modules javafx.controls,javafx.fxml -d $(BUILD_DIR) View/Client.java 
-	java  --module-path /home/bully/Desktop/javafx-sdk-20/lib --add-modules javafx.controls,javafx.fxml -cp $(BUILD_DIR) Client
+	javac --module-path /usr/share/openjfx/lib --add-modules javafx.controls,javafx.fxml -d $(BUILD_DIR) View/Client.java 
+	java  --module-path /usr/share/openjfx/lib --add-modules javafx.controls,javafx.fxml -cp $(BUILD_DIR) Client
 
 
 interface:

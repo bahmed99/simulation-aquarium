@@ -83,10 +83,16 @@ void sendFishesContinuously(void* client_fd)
 {
    while(1){
         char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
-        if(msg != NULL){
+        logger_init("log_controlpler.txt");
+        logger_log(INFO, "test %d \n", strcmp(msg, "list "));
+        logger_close();
+
+
+        if(strcmp(msg, "list ") != 0){
             write(*(int *)client_fd, msg, strlen(msg));
+            sleep(fish_update_interval);
+
         }
-        sleep(fish_update_interval);
         free(msg);
    }
 }

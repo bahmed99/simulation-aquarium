@@ -32,15 +32,9 @@ int main() {
    
 
     Aquarium *aquarium = loadAquarium("aquarium");
-    authenticate("hello in as N1", aquarium, 1);
-    authenticate("hello in as N2", aquarium, 2);
+    
 
-    addFish(aquarium,1,"fish" ,61,52,4,3, "RandomWayPoint");
-
-    addFishVisitor(&aquarium->views[0], aquarium->views[0].fishes[0], 1);
-    addFishVisitor(&aquarium->views[1], aquarium->views[0].fishes[0], 2);
-
-    printf("num_fishes_visitors: %d\n", aquarium->views[1].num_fishes_visitors);
+    printf("num_fishes_visitors: %d\n", strcmp("list ", "list [PoissonRouge at 92x40,10x4,5] [PoissonClown at 22x80,12x6,5]"));
     
 
     return 0;

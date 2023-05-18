@@ -37,6 +37,7 @@ struct Fish
     char mobilityPattern[50];
     Coordinates coord;
     int mobile;
+    int property;
 };
 typedef struct Fish Fish;
 

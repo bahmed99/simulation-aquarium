@@ -260,10 +260,10 @@ public class Client extends Application {
                         System.out.print("   \n-> ");
                         System.out.println(response.trim());
                         System.out.print("$ ");
+                        getId(response);
                         fishGroupLock.lock();
                         getFishesContinuously(response);
                         fishGroupLock.unlock();
-                        getId(response);
                     }
                 }
                  System.out.print("$ ");

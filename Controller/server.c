@@ -92,6 +92,8 @@ void sendFishesContinuously(void* client_fd)
             write(*(int *)client_fd, msg, strlen(msg));
             sleep(fish_update_interval);
 
+        } else {
+            sleep(1);
         }
         free(msg);
    }

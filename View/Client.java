@@ -89,8 +89,8 @@ public class Client extends Application {
         double width = screen.getBounds().getWidth();
         double height = screen.getBounds().getHeight();
 
-        stage.setWidth(width/2);
-        stage.setHeight(height);
+        stage.setWidth(500);
+        stage.setHeight(500);
 
         Image backgroundImage = new Image("Images/aquarium.jpg");
         backgroundImageView = new ImageView(backgroundImage);
@@ -104,7 +104,7 @@ public class Client extends Application {
 
             
         Scene scene = new Scene(root, 500, 500);
-        //stage.setResizable(false);
+        stage.setResizable(false);
         //stage.setResizable(false);
         stage.setTitle(id);
         stage.setScene(scene);
@@ -157,8 +157,8 @@ public class Client extends Application {
                     ImageView fishImageView = (ImageView) fish.get(0);
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
-                    System.out.println(destinationsX.toString());
-                    System.out.println(destinationsY.toString());
+                    // System.out.println(destinationsX.toString());
+                    // System.out.println(destinationsY.toString());
                     boolean started = (boolean) fish.get(4);
                     int x = (int) fish.get(5);
                     if (started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
@@ -182,12 +182,12 @@ public class Client extends Application {
                             } else {
                                 fishImageView.setScaleX(1);
                             }
-                            // destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            // destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                             // List<Integer> forbiddenX = = new ArrayList<>();
-                            // forbiddenX.add(id.equals("N2") || id.equals("N4") ? -700 : 700)
+                            // forbiddenX.add(id.equals("N2") || id.equals("N4") ? -500 : 500)
                             // List<Integer> forbiddenY = = new ArrayList<>();
-                            // forbiddenY.add(id.equals("N1") || id.equals("N2") ? 700 : -700)
-                            if (destinationsX.get(0) >= 0 && (destinationsX.get(0) != 700 &&  destinationsY.get(0) != 700)&& destinationsY.get(0) >= 0) {
+                            // forbiddenY.add(id.equals("N1") || id.equals("N2") ? 500 : -500)
+                            if (destinationsX.get(0) >= 0 && (destinationsX.get(0) != 500 &&  destinationsY.get(0) != 500)&& destinationsY.get(0) >= 0) {
                                 fishTransition2.play();
                             }
                             destinationsX.remove(0);
@@ -373,7 +373,7 @@ public class Client extends Application {
                 sizeY = Integer.parseInt(finalCoordinateMatcher.group(2));
             }
             String FishPath = "Images/Fish/"+fishName+".png";
-            Image fishImage = new Image(FishPath, 100, 100, false, false);
+            Image fishImage = new Image(FishPath, 60, 60, false, false);
             ImageView fishImageView = new ImageView(fishImage);
             fishImageView.setTranslateX(fishImageView.getFitWidth() / 2);
             fishImageView.setTranslateY(fishImageView.getFitHeight() / 2);
@@ -449,9 +449,9 @@ public class Client extends Application {
                     int marked=0;
                     if(posX<0 && posY<0){
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {         
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
                             destinationsX.add(posX);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -461,7 +461,7 @@ public class Client extends Application {
                     }
                     else if(posX<0 && posY>0){
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
                             destinationsX.add(posX);
                             destinationsY.add(posY);
                             destinationsY.add(posY);
@@ -476,7 +476,7 @@ public class Client extends Application {
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
                             destinationsX.add(posX);
                             destinationsX.add(posX);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                             destinationsY.add(posY);
                             marked=(int)fish.get(5)+1;
                         } else {
@@ -492,7 +492,7 @@ public class Client extends Application {
                             destinationsY.remove(destinationsY.size() - 1);
                             //System.out.println("UP pos 2 +"); 
                             //destinationsX.add(posX);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
 
                             destinationsX.add(posX);
                             destinationsY.add(posY);
@@ -501,7 +501,7 @@ public class Client extends Application {
                             destinationsX.remove(destinationsX.size() - 1);
                             //destinationsY.remove(destinationsY.size() - 1);
                             //System.out.println("UP pos 2 ++"); 
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
                             //destinationsY.add(posY);
 
                             destinationsX.add(posX);
@@ -511,8 +511,8 @@ public class Client extends Application {
                             destinationsX.remove(destinationsX.size() - 1);
                             destinationsY.remove(destinationsY.size() - 1);
                             //System.out.println("UP pos 2 +++"); 
-                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
-                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                            destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
+                            destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                             
                             destinationsX.add(posX);
                             destinationsY.add(posY);  
@@ -543,13 +543,13 @@ public class Client extends Application {
         if (create) {
             if (posX >= 0 && posY >= 0) {
                 String FishPath = resources + "/Fish/" + fishName + ".png";
-                Image fishImage = new Image(FishPath, 100, 100, false, false);
+                Image fishImage = new Image(FishPath, 60, 60, false, false);
                 ImageView fishImageView = new ImageView(fishImage);
                 List<Object> newfish = new ArrayList<>();
                 List<Integer> destinationsX = new ArrayList<>();
                 List<Integer> destinationsY = new ArrayList<>();
-                destinationsX.add(id.equals("N2") || id.equals("N4") ? -700 : 700);
-                destinationsY.add(id.equals("N1") || id.equals("N2") ? 700 : -700);
+                destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
+                destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                 destinationsX.add(posX);
                 destinationsY.add(posY);
 

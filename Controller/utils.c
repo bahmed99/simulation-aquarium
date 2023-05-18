@@ -7,6 +7,7 @@
 
 // Liste globale des valeurs valides pour mobilityPattern
 const char *MobilityPatterns[] = {"RandomWayPoint", "HorinzontalPathWay"};
+int i = 1;
 
 Aquarium *loadAquarium(char *AquariumName)
 {
@@ -628,7 +629,6 @@ char *status(Aquarium *aquarium, int client)
 
 char *pong(char *port)
 {
-
     char *pong = (char *)malloc(1000);
     sprintf(pong, "pong %s\n", port);
     return pong;
@@ -1049,6 +1049,35 @@ int *RandomWayPoint(Aquarium *aquarium)
 
     return coord;
 }
+
+int *StayInView(int ViewWidth, int ViewHeight)
+{
+    int *coord = (int *)malloc(2 * sizeof(int));
+    int i;
+    int j;
+
+    int x = rand() % ViewWidth;
+    int y = rand() % ViewHeight;
+
+    coord[0] = x;
+    coord[1] = y;
+
+    return coord;
+}
+
+int *ViewToView(Aquarium *aquarium) {
+    int *coord = (int *)malloc(2 * sizeof(int));
+    
+    int x = rand() % aquarium->views[i-1].width;
+    int y = rand() % aquarium->views[i-1].height;
+    i = i%4 + 1;
+
+    coord[0] = x;
+    coord[1] = y;
+
+    return coord;
+
+}
 // Fonction qui recherche une entrée dans la table de hachage des fonctions de PathWay
 // PathWayFunction findPathWayFunction(char* name) {
 //     for (int i = 0; i < PATH_WAY_TABLE_SIZE; i++) {
@@ -1065,6 +1094,14 @@ int *applyPathWay(Aquarium *aquarium, char *pathWay)
     if (strcmp(pathWay, "RandomWayPoint") == 0)
     {
         return RandomWayPoint(aquarium);
+    }
+    // if (strcmp(pathWay, "StayInView") == 0)
+    // {
+    //     return StayInView(aquarium);
+    // }
+    if (strcmp(pathWay, "ViewToView") == 0)
+    {
+        return ViewToView(aquarium);
     }
 }
 

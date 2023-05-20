@@ -210,12 +210,12 @@ void *ClientHandler(void *client_fd)
 
                 length_write = write(*(int *)client_fd, msg, strlen(msg));
             }
-            else if(verifRegex(buffer,clientCommand[6])==1){
+            // else if(verifRegex(buffer,clientCommand[6])==1){
                 
-                char *msg = ls(aquarium, *(int *)client_fd);
-                length_write = write(*(int *)client_fd, msg, strlen(msg));
-                free(msg);
-            }
+            //     char *msg = ls(aquarium, *(int *)client_fd);
+            //     length_write = write(*(int *)client_fd, msg, strlen(msg));
+            //     free(msg);
+            // }
             else if (verifRegex(buffer, clientCommand[5]) == 1)
             {
                 disconnect(aquarium, *(int *)client_fd);

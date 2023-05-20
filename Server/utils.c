@@ -1067,51 +1067,51 @@ int *applyPathWay(Aquarium *aquarium, char *pathWay, View view)
     }
 }
 
-char *ls(Aquarium *aquarium, int client)
-{
-    char *ls_msg = (char *)malloc(1000);
-    if (aquarium != NULL)
-    {
-        int i;
+// char *ls(Aquarium *aquarium, int client)
+// {
+//     char *ls_msg = (char *)malloc(1000);
+//     if (aquarium != NULL)
+//     {
+//         int i;
 
-        int test = 0;
-        for (i = 0; i < aquarium->num_views; i++)
-        {
-            if (aquarium->views[i].socket == client)
-            {
-                test = 1;
-                char *tmp = (char *)malloc(1000);
-                int j;
+//         int test = 0;
+//         for (i = 0; i < aquarium->num_views; i++)
+//         {
+//             if (aquarium->views[i].socket == client)
+//             {
+//                 test = 1;
+//                 char *tmp = (char *)malloc(1000);
+//                 int j;
 
-                int k;
-                strcpy(ls_msg, "");
-                for (k = 0; k < 3; k++)
-                {
-                    strcat(ls_msg, "List ");
-                    for (j = 0; j < aquarium->views[i].num_fishes; j++)
-                    {
-                        if (aquarium->views[i].fishes[j].mobile == 1)
-                        {
-                            int *corr = applyPathWay(aquarium, aquarium->views[i].fishes[j].mobilityPattern, aquarium->views[i]);
-                            sprintf(tmp, "[%s at %dx%d,%dx%d, 5] ", aquarium->views[i].fishes[j].name, corr[0], corr[1], aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height);
-                            strcat(ls_msg, tmp);
-                            free(corr);
-                        }
-                    }
-                    strcat(ls_msg, "\n");
-                }
-                free(tmp);
-            }
-        }
-        if (test == 0)
-        {
-            sprintf(ls_msg, "NOK : Vous n'avez pas de vue associé\n");
-            return ls_msg;
-        }
+//                 int k;
+//                 strcpy(ls_msg, "");
+//                 for (k = 0; k < 3; k++)
+//                 {
+//                     strcat(ls_msg, "List ");
+//                     for (j = 0; j < aquarium->views[i].num_fishes; j++)
+//                     {
+//                         if (aquarium->views[i].fishes[j].mobile == 1)
+//                         {
+//                             int *corr = applyPathWay(aquarium, aquarium->views[i].fishes[j].mobilityPattern, aquarium->views[i]);
+//                             sprintf(tmp, "[%s at %dx%d,%dx%d, 5] ", aquarium->views[i].fishes[j].name, corr[0], corr[1], aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height);
+//                             strcat(ls_msg, tmp);
+//                             free(corr);
+//                         }
+//                     }
+//                     strcat(ls_msg, "\n");
+//                 }
+//                 free(tmp);
+//             }
+//         }
+//         if (test == 0)
+//         {
+//             sprintf(ls_msg, "NOK : Vous n'avez pas de vue associé\n");
+//             return ls_msg;
+//         }
 
-        return ls_msg;
-    }
-    sprintf(ls_msg, "NOK : l'aquarium n'est pas initilialisé\n");
+//         return ls_msg;
+//     }
+//     sprintf(ls_msg, "NOK : l'aquarium n'est pas initilialisé\n");
 
-    return ls_msg;
-}
+//     return ls_msg;
+// }

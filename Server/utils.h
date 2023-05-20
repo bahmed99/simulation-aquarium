@@ -257,16 +257,16 @@ int isValidMobilityPattern(const char* mobilityPattern);
 
 
 
-/**
- * @brief return position of fish
- * 
- * @param aquarium
- * @param client
- * 
- * @return char* 
- *  
-*/
-char* ls(Aquarium *aquarium, int client);
+// /**
+//  * @brief return position of fish
+//  * 
+//  * @param aquarium
+//  * @param client
+//  * 
+//  * @return char* 
+//  *  
+// */
+// char* ls(Aquarium *aquarium, int client);
 
 /**
  * @brief return random positions

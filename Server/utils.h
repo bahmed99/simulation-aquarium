@@ -301,7 +301,7 @@ int* RandomWayPoint(Aquarium *aquarium) ;
 
 
 
-int* applyPathWay(Aquarium* aquarium, char* pathWay);
+int* applyPathWay(Aquarium* aquarium, char* pathWay, View view);
 /**
  * 
  * @brief search for a pathWay function by its name

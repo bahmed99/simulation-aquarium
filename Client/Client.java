@@ -47,13 +47,12 @@ public class Client extends Application {
     private Lock fishGroupLock = new ReentrantLock();
     private String controller_port;
     private String display_timeout_value;
-    private boolean gFC = false;
     private String resources;
     private Stage stage;
     
     public static void main(String[] args) {
-            launch(args);
-        }
+        launch(args);
+    }
 
     @Override
     public void start(Stage stage) {
@@ -85,13 +84,6 @@ public class Client extends Application {
             System.err.println("Error loading config file: " + e.getMessage());
         }
 
-        Screen screen = Screen.getPrimary();
-        double width = screen.getBounds().getWidth();
-        double height = screen.getBounds().getHeight();
-
-        stage.setWidth(500);
-        stage.setHeight(500);
-
         Image backgroundImage = new Image("Images/aquarium.jpg");
         backgroundImageView = new ImageView(backgroundImage);
         fishGroup = new Group();
@@ -102,10 +94,11 @@ public class Client extends Application {
 
 
 
-            
+        stage.setWidth(500);
+        stage.setHeight(500);
+
         Scene scene = new Scene(root, 500, 500);
         stage.setResizable(false);
-        //stage.setResizable(false);
         stage.setTitle(id);
         stage.setScene(scene);
         
@@ -157,8 +150,6 @@ public class Client extends Application {
                     ImageView fishImageView = (ImageView) fish.get(0);
                     List<Integer> destinationsX = (List<Integer>) fish.get(2);
                     List<Integer> destinationsY = (List<Integer>) fish.get(3);
-                    // System.out.println(destinationsX.toString());
-                    // System.out.println(destinationsY.toString());
                     boolean started = (boolean) fish.get(4);
                     int x = (int) fish.get(5);
                     if (started == true && destinationsX.size() >= 2 && destinationsY.size() >= 2) {
@@ -182,11 +173,6 @@ public class Client extends Application {
                             } else {
                                 fishImageView.setScaleX(1);
                             }
-                            // destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
-                            // List<Integer> forbiddenX = = new ArrayList<>();
-                            // forbiddenX.add(id.equals("N2") || id.equals("N4") ? -500 : 500)
-                            // List<Integer> forbiddenY = = new ArrayList<>();
-                            // forbiddenY.add(id.equals("N1") || id.equals("N2") ? 500 : -500)
                             if (destinationsX.get(0) >= 0 && (destinationsX.get(0) != 500 &&  destinationsY.get(0) != 500)&& destinationsY.get(0) >= 0) {
                                 fishTransition2.play();
                             }
@@ -196,19 +182,6 @@ public class Client extends Application {
                                 destinationsX.remove(0);
                                 destinationsY.remove(0);
                             }
-                            // Task<Void> task = new Task<Void>() {
-                            //     @Override
-                            //     protected Void call() throws Exception {
-                            //         Platform.runLater(() -> {
-                            //             fishImageView.setVisible(false);
-                            //             fishGroup.getChildren().remove(container);
-                            //             extractedImageViews.getChildren().remove(container);
-                            //         });
-
-                            //         return null;
-                            //     }
-                            // };
-                            // new Thread(task).start();
                         } else {
                             if (destinationsX.get(1) < destinationsX.get(0)) {
                                 fishImageView.setScaleX(-1);
@@ -281,14 +254,9 @@ public class Client extends Application {
                 String userInput;
                 System.out.print("$ ");
                 while ((userInput = stdIn.readLine()) != null) {
-                  
-                        
                     addFish(userInput);
                     StartFish(userInput);
                     delFish(userInput);
-                    // if (userInput.equals("getFishesContinuously")) {
-                    //     gFC = true;
-                    // }
                      
                    out.println(userInput);
 
@@ -488,10 +456,7 @@ public class Client extends Application {
                     else if (posX>=0 && posY>=0){ 
     
                         if (destinationsX.get(destinationsX.size() - 1) >= 0 && destinationsY.get(destinationsY.size() - 1)< 0) {
-                            //destinationsX.remove(destinationsX.size() - 1);
                             destinationsY.remove(destinationsY.size() - 1);
-                            //System.out.println("UP pos 2 +"); 
-                            //destinationsX.add(posX);
                             destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
 
                             destinationsX.add(posX);
@@ -499,10 +464,8 @@ public class Client extends Application {
                         }
                         else if (destinationsX.get(destinationsX.size() - 1) < 0 && destinationsY.get(destinationsY.size() - 1) >= 0) {
                             destinationsX.remove(destinationsX.size() - 1);
-                            //destinationsY.remove(destinationsY.size() - 1);
-                            //System.out.println("UP pos 2 ++"); 
                             destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
-                            //destinationsY.add(posY);
+
 
                             destinationsX.add(posX);
                             destinationsY.add(posY);  
@@ -510,7 +473,6 @@ public class Client extends Application {
                         else if (destinationsX.get(destinationsX.size() - 1) < 0 && destinationsY.get(destinationsY.size() - 1) < 0) {
                             destinationsX.remove(destinationsX.size() - 1);
                             destinationsY.remove(destinationsY.size() - 1);
-                            //System.out.println("UP pos 2 +++"); 
                             destinationsX.add(id.equals("N2") || id.equals("N4") ? -500 : 500);
                             destinationsY.add(id.equals("N1") || id.equals("N2") ? 500 : -500);
                             
@@ -518,7 +480,6 @@ public class Client extends Application {
                             destinationsY.add(posY);  
                         } 
                         else {
-                            //System.out.println("UP pos 2 ++++"); 
                             destinationsX.add(posX);
                             destinationsY.add(posY);
                         }
@@ -592,7 +553,5 @@ public class Client extends Application {
             System.err.println("Error closing socket: " + e.getMessage());
         }
     }
-
-
-    }
+}
 

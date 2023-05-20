@@ -232,19 +232,8 @@ void *ClientHandler(void *client_fd)
             else if (strcmp(buffer, "getFishesContinuously") == 0 && is_continuousFishesThread  == 0)
             {
                 //create a thread to send fishes continuously
-
                 is_continuousFishesThread = 1;
                 pthread_create(&continuousFishesThread, NULL,  (void *)sendFishesContinuously, (void *)client_fd);
-                // pthread_detach(continuousFishesThread);
-
-
-                // for (int i = 0; i < 3; i ++) {
-                //     char *msg = getFishesContinuously(aquarium, *(int *)client_fd);
-                //     length_write = write(*(int *)client_fd, msg, strlen(msg));
-                //     msg = getFishesContinuously(aquarium, *(int *)client_fd);
-                //     sleep(5);
-                // }
-                
             }
             else
             {
@@ -276,8 +265,6 @@ void ServerAction(void *buffer)
     int n;
     char *output[10];
     char *str_parse = malloc(100 * sizeof(char));
-    // debug
-    // printf("le contenu du buffer est : %s", (char *)buffer);
     // load aquarium
     if (verifRegex(buffer, serverCommand[0]) == 1)
     {

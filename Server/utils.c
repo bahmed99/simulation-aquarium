@@ -6,7 +6,7 @@
 #include "utils.h"
 
 // Liste globale des valeurs valides pour mobilityPattern
-const char *MobilityPatterns[] = {"RandomWayPoint", "HorinzontalPathWay"};
+const char *MobilityPatterns[] = {"RandomWayPoint", "ViewToView", "StayInView"};
 int i = 1;
 
 Aquarium *loadAquarium(char *AquariumName)
@@ -170,7 +170,6 @@ void deleteView(Aquarium *a, char *viewName)
         }
 
         // Supprimer la vue à l'index spécifié
-        // free(a->views[index].fishes);
         for (int i = index; i < a->num_views - 1; i++)
         {
             a->views[i] = a->views[i + 1];
@@ -725,50 +724,6 @@ int verifFishInView(int x, int y, View v)
     return 0;
 }
 
-// void addFishVisitor(View *v, Fish f, int original_view)
-// {
-
-//     logger_log(INFO, "addFishVisitor\n");
-//     logger_log(INFO, "v.num_fishes_visitors = %d\n", v->num_fishes_visitors);
-//     if (v->num_fishes_visitors == 0)
-//     {
-//         v->fishes_visitors = (Fish *)malloc(sizeof(Fish));
-//         v->fishes_visitors[0] = f;
-//         v->num_fishes_visitors++;
-//         //v->fishes_visitors_view = (int *)malloc(sizeof(int));
-//         v->fishes_visitors_view[0] = original_view;
-//     }
-//     else
-//     {
-//         v->num_fishes_visitors++;
-//         v->fishes_visitors = (Fish *)realloc(v->fishes_visitors, v->num_fishes_visitors * sizeof(Fish));
-//         v->fishes_visitors[v->num_fishes_visitors - 1] = f;
-//         //v->fishes_visitors_view = (int *)realloc(v->fishes_visitors_view, v->num_fishes_visitors * sizeof(int));
-//         v->fishes_visitors_view[v->num_fishes_visitors - 1] = original_view;
-//     }
-//     logger_log(INFO, "v->num_fishes_visitors = %d\n", v->num_fishes_visitors);
-//     //log name fish
-//     logger_log(INFO, "Le poisson %s :\n", f.name);
-
-// }
-
-// void deleteFishVisitorFromView(View v, Fish f, int i)
-// {
-//     for (int j = i; j < v.num_fishes_visitors; j++)
-//     {
-//         v.fishes_visitors[j] = v.fishes_visitors[j + 1];
-//         v.fishes_visitors_view[j] = v.fishes_visitors_view[j + 1];
-//     }
-
-//     v.num_fishes_visitors--;
-
-//     v.fishes_visitors = (Fish *)realloc(v.fishes_visitors, v.num_fishes_visitors * sizeof(Fish));
-
-//     logger_log(INFO,"Le poisson %s a été supprimé de la vue %d\n", f.name, v.num_fishes_visitors);
-
-//     //v.fishes_visitors_view = (int *)realloc(v.fishes_visitors_view, v.num_fishes_visitors * sizeof(int));
-// }
-
 char *getFishesContinuously(Aquarium *aquarium, int client)
 {
 
@@ -806,7 +761,7 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
                 {
                     Fish fish = aquarium->views[i].fishes[j];
 
-                    destination = applyPathWay(aquarium, fish.mobilityPattern);
+                    destination = applyPathWay(aquarium, fish.mobilityPattern, aquarium->views[i]);
 
                     if (verifFishInView(destination[0], destination[1], viewClient) == 1)
                     {
@@ -892,13 +847,8 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
                             }
                         }
                     }
-                    //printf("TEST 1");
                     fish = aquarium->views[i].fishes[j];
                     sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x % ViewWidth, fish.coord.y % ViewHeight, fish.height, fish.width, "5");
-
-                    // fish = aquarium->views[i].fishes[j];
-                    // aquarium->views[i].fishes[j].coord.x = destination[0] % ViewWidth;
-                    // aquarium->views[i].fishes[j].coord.y = destination[1] % ViewHeight;
                     free(destination);
                 }
             }
@@ -924,7 +874,6 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
 
                             if (verifFishInView(fish.coord.x, fish.coord.y, viewClient) == 1)
                             {
-
                                 continue;
                             }
 
@@ -990,12 +939,10 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
                                         aquarium->views[i].fishes_visitors[j].coord.y = -y;
                                         }
                                 }
-                                //printf("TEST 2");
                                 fish = aquarium->views[i].fishes_visitors[j];
                                 sprintf(FishList, "%s [%s at %dx%d, %dx%d, %s] ", FishList, fish.name, fish.coord.x % ViewWidth, fish.coord.y % ViewHeight, fish.height, fish.width, "5");
 
                                 // delete
-                                // deleteFishVisitorFromView(aquarium->views[i], fish, k);
                                 aquarium->views[i].num_fishes_visitors--;
                                 aquarium->views[i].fishes_visitors[j] = aquarium->views[i].fishes_visitors[aquarium->views[i].num_fishes_visitors];
                                 aquarium->views[i].fishes_visitors_view[j] = aquarium->views[i].fishes_visitors_view[aquarium->views[i].num_fishes_visitors];
@@ -1016,9 +963,6 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
 
                     if (verifFishInView(abs(fish.coord.x), abs(fish.coord.y), viewClient))
                     {
-
-                        // addFishVisitor(&aquarium->views[indice_view_client], fish, i);
-                        //printf("TEST 3");
                         aquarium->views[indice_view_client].num_fishes_visitors++;
                         aquarium->views[indice_view_client].fishes_visitors[aquarium->views[indice_view_client].num_fishes_visitors - 1] = fish;
                         aquarium->views[indice_view_client].fishes_visitors_view[aquarium->views[indice_view_client].num_fishes_visitors - 1] = i;
@@ -1031,7 +975,6 @@ char *getFishesContinuously(Aquarium *aquarium, int client)
         }
     }
     logger_close();
-    //printf("\n");
     return FishList;
 }
 
@@ -1067,10 +1010,38 @@ int *StayInView(int ViewWidth, int ViewHeight)
 
 int *ViewToView(Aquarium *aquarium) {
     int *coord = (int *)malloc(2 * sizeof(int));
+    int x = 0;
+    int y = 0;
+    if (i == 1) {
+        x = rand() % 500;
+        y = rand() % 500;
+        i += 1;
+    } else if (i == 2) {
+        x = rand() % 1000;
+        if (x < 500) {
+            x += 500;
+        }
+        y = rand() % 500;
+        i += 1;
+    } else if (i == 3) {
+        y = rand() % 1000;
+        if (y < 500) {
+            y += 500;
+        }
+        x = rand() % 500;
+        i += 1;
+    } else if (i == 4) {
+        y = rand() % 1000;
+        if (y < 500) {
+            y += 500;
+        }
+        x = rand() % 500;
+        if (x < 500) {
+            x += 500;
+        }
+        i = 1;
+    }
     
-    int x = rand() % aquarium->views[i-1].width;
-    int y = rand() % aquarium->views[i-1].height;
-    i = i%4 + 1;
 
     coord[0] = x;
     coord[1] = y;
@@ -1078,28 +1049,19 @@ int *ViewToView(Aquarium *aquarium) {
     return coord;
 
 }
-// Fonction qui recherche une entrée dans la table de hachage des fonctions de PathWay
-// PathWayFunction findPathWayFunction(char* name) {
-//     for (int i = 0; i < PATH_WAY_TABLE_SIZE; i++) {
-//         if (strcmp(name, pathWayTable[i].name) == 0) {
-//             return pathWayTable[i].function;
-//         }
-//     }
-//     return NULL;
-// }
 
-int *applyPathWay(Aquarium *aquarium, char *pathWay)
+int *applyPathWay(Aquarium *aquarium, char *pathWay, View view)
 {
     // PathWayFunction function = findPathWayFunction(pathWay);
     if (strcmp(pathWay, "RandomWayPoint") == 0)
     {
         return RandomWayPoint(aquarium);
     }
-    // if (strcmp(pathWay, "StayInView") == 0)
-    // {
-    //     return StayInView(aquarium);
-    // }
-    if (strcmp(pathWay, "ViewToView") == 0)
+    else if (strcmp(pathWay, "StayInView") == 0)
+    {
+        return StayInView(view.width, view.height);
+    }
+    else if (strcmp(pathWay, "ViewToView") == 0)
     {
         return ViewToView(aquarium);
     }
@@ -1130,7 +1092,7 @@ char *ls(Aquarium *aquarium, int client)
                     {
                         if (aquarium->views[i].fishes[j].mobile == 1)
                         {
-                            int *corr = applyPathWay(aquarium, aquarium->views[i].fishes[j].mobilityPattern);
+                            int *corr = applyPathWay(aquarium, aquarium->views[i].fishes[j].mobilityPattern, aquarium->views[i]);
                             sprintf(tmp, "[%s at %dx%d,%dx%d, 5] ", aquarium->views[i].fishes[j].name, corr[0], corr[1], aquarium->views[i].fishes[j].width, aquarium->views[i].fishes[j].height);
                             strcat(ls_msg, tmp);
                             free(corr);

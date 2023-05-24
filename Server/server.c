@@ -279,9 +279,9 @@ void ServerAction(void *buffer)
     }
 
     // add view
-    else if (verifRegex(buffer, serverCommand[2]) == 1)
+    else if (verifRegex(buffer, serverCommand[1]) == 1)
     {
-        char **params = extractStrings(buffer, extractServerCommand[2], 5);
+        char **params = extractStrings(buffer, extractServerCommand[1], 5);
         int x = atoi(params[1]);
         int y = atoi(params[2]);
         int width = atoi(params[3]);
@@ -294,15 +294,15 @@ void ServerAction(void *buffer)
         free(params);
     }
     // delete view
-    else if (verifRegex(buffer, serverCommand[3]) == 1)
+    else if (verifRegex(buffer, serverCommand[2]) == 1)
     {
-        char **params = extractStrings(buffer, extractServerCommand[3], 1);
+        char **params = extractStrings(buffer, extractServerCommand[2], 1);
         deleteView(aquarium, params[0]);
     }
     // save aquarium
-    else if (verifRegex(buffer, serverCommand[4]) == 1)
+    else if (verifRegex(buffer, serverCommand[3]) == 1)
     {
-        char **params = extractStrings(buffer, extractServerCommand[4], 1);
+        char **params = extractStrings(buffer, extractServerCommand[3], 1);
         saveAquarium(aquarium, params[0]);
     }
 

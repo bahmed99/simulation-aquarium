@@ -24,4 +24,5 @@ logger_server:
 	$(CC) $(CFLAGS) -c Server/logger.c -o $(BUILD_DIR)/logger_server.o
 
 clean:
-	find Build/ \(-iname '*.class' -o -iname '*.o' \) -type f -delete
+	find Build/ \-iname '*.o'  -type f -delete
+	find Build/ \-iname '*.class'  -type f -delete
